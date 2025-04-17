@@ -1,0 +1,49 @@
+services:
+
+  go:
+    build:
+      context: ./docker/go/
+    ports:
+      - "8080:8080"
+      - "2345:2345"
+    volumes:
+      - .:/app
+    security_opt:
+      - apparmor:unconfined
+    cap_add:
+      - SYS_PTRACE
+
+  mysql:
+    build:
+      context: ./docker/mysql/
+    platform: linux/x86_64
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_volume:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    environment:
+      - MYSQL_DATABASE=time_report_db
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=root_pass
+
+  redis:
+    image: redis:7.2.4-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_volume:/data
+    command: [ "redis-server", "--appendonly", "yes" ]
+
+  schemaspy:
+    image: schemaspy/schemaspy:snapshot
+    volumes:
+      - ./cmd/api/docs/schemaspy:/output
+      - ./schemaspy/schemaspy.properties:/schemaspy.properties
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_volume:
+  redis_volume:

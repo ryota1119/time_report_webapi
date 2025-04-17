@@ -1,0 +1,1890 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Time Report WebAPIのSwaggerドキュメント",
+        "title": "Time Report WebAPI",
+        "termsOfService": "http://example.com/terms/",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "description": "ユーザーログインを行う",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.AuthLoginBodyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.AuthLoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ログアウトを行う",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Logout",
+                "responses": {
+                    "200": {
+                        "description": "logged out",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    }
+                }
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "description": "リフレッシュトークンを利用してアクセストークンを再生成を行う",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "RefreshToken",
+                "parameters": [
+                    {
+                        "description": "payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.RefreshTokenAuthRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.AuthRefreshTokenResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    }
+                }
+            }
+        },
+        "/budgets": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "予算一覧を返却する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "budget"
+                ],
+                "summary": "List Budgets",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/presenter.BudgetResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "予算を新規作成する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "budget"
+                ],
+                "summary": "Create Budget",
+                "parameters": [
+                    {
+                        "description": "budget create payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.CreateBudgetsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.BudgetCreateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/budgets/{budgetID}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "予算情報を返却する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "budget"
+                ],
+                "summary": "Get Budget",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "budgetID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.BudgetGetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "予算情報を更新する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "budget"
+                ],
+                "summary": "Update Budget",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "budgetID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "update budgets payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.BudgetUpdateBodyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.BudgetUpdateResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "NoContent"
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "予算情報を削除する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "budget"
+                ],
+                "summary": "Delete Budget",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "budgetID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/customers": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "顧客一覧を返却する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customer"
+                ],
+                "summary": "List Customers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/presenter.CustomerResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "顧客を新規作成する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customer"
+                ],
+                "summary": "Create Customer",
+                "parameters": [
+                    {
+                        "description": "組織新規作成APIのペイロード",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.CreateCustomersBodyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.CustomerCreateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/customers/{customerID}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "顧客情報を返却する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customer"
+                ],
+                "summary": "Get Customer",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "customerID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.CustomerGetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "顧客情報を更新する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customer"
+                ],
+                "summary": "Update Customer",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "customerID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.CustomerUpdateBodyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.CustomerUpdateResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "NoContent"
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "顧客情報を削除する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customer"
+                ],
+                "summary": "Delete Customer",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "customerID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/organization": {
+            "get": {
+                "description": "組織情報を取得する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "organization"
+                ],
+                "summary": "GetOrganization",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.OrganizationRegisterResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "404": {
+                        "description": "NotFound"
+                    }
+                }
+            }
+        },
+        "/organization/register": {
+            "post": {
+                "description": "組織と管理者ユーザーを新規作成する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "organization"
+                ],
+                "summary": "Register",
+                "parameters": [
+                    {
+                        "description": "組織と管理者ユーザーを新規作成するボディリクエスト",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.RegisterOrganizationBodyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.OrganizationRegisterResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    }
+                }
+            }
+        },
+        "/projects": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "プロジェクト一覧を返却する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "project"
+                ],
+                "summary": "List Projects",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/presenter.ProjectResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "プロジェクトを新規作成する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "project"
+                ],
+                "summary": "Create Project",
+                "parameters": [
+                    {
+                        "description": "project create payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.CreateProjectsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.ProjectCreateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/projects/{projectID}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "プロジェクト情報を返却する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "project"
+                ],
+                "summary": "Get Project",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "projectID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.ProjectGetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "プロジェクト情報を更新する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "project"
+                ],
+                "summary": "Update Project",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "projectID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "update projects payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.ProjectUpdateBodyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.ProjectUpdateResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "NoContent"
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "プロジェクト情報を削除する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "project"
+                ],
+                "summary": "Delete Project",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "projectID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/timers/start": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "タイマーを開始する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Timer"
+                ],
+                "summary": "Start Timer",
+                "parameters": [
+                    {
+                        "description": "start timer payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.StartTimerRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.StartTimerResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ユーザー一覧を返却する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "List Users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/presenter.UserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ユーザーを新規作成する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Create User",
+                "parameters": [
+                    {
+                        "description": "ユーザー新規作成APIのペイロード",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.UserCreateBodyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.UserCreateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/users/{userID}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ユーザー情報を返却する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Get User",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.UserGetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ユーザー情報を更新する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Update User",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "payload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.UserUpdateBodyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/presenter.UserUpdateResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "NoContent"
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ユーザー情報を削除する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Delete User",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "BadRequest"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "entities.Role": {
+            "type": "string",
+            "enum": [
+                "admin",
+                "member",
+                "unknown"
+            ],
+            "x-enum-varnames": [
+                "AdminRole",
+                "MemberRole",
+                "UnknownRole"
+            ]
+        },
+        "handler.AuthLoginBodyRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "organization_code",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "example@example.com"
+                },
+                "organization_code": {
+                    "type": "string",
+                    "example": "my_organization_code"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "password"
+                }
+            }
+        },
+        "handler.BudgetUpdateBodyRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "endMonth",
+                "projectID",
+                "startMonth"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "integer",
+                    "example": 300000
+                },
+                "endMonth": {
+                    "type": "string",
+                    "example": "2025-01-02"
+                },
+                "memo": {
+                    "type": "string",
+                    "example": "budget memo"
+                },
+                "projectID": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "startMonth": {
+                    "type": "string",
+                    "example": "2020-01-01"
+                }
+            }
+        },
+        "handler.CreateBudgetsRequest": {
+            "type": "object",
+            "required": [
+                "budgetAmount",
+                "projectID"
+            ],
+            "properties": {
+                "budgetAmount": {
+                    "type": "integer",
+                    "example": 300000
+                },
+                "budgetMemo": {
+                    "type": "string",
+                    "example": "budget memo"
+                },
+                "endDate": {
+                    "type": "string",
+                    "example": "2025-01"
+                },
+                "projectID": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "startDate": {
+                    "type": "string",
+                    "example": "2020-01"
+                }
+            }
+        },
+        "handler.CreateCustomersBodyRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "endDate": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "unitPrice": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.CreateProjectsRequest": {
+            "type": "object",
+            "required": [
+                "customer_id",
+                "name"
+            ],
+            "properties": {
+                "customer_id": {
+                    "type": "integer"
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "unitPrice": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.CustomerUpdateBodyRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "endDate": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "unitPrice": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ProjectUpdateBodyRequest": {
+            "type": "object",
+            "required": [
+                "customer_id"
+            ],
+            "properties": {
+                "customer_id": {
+                    "type": "integer"
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "unitPrice": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.RefreshTokenAuthRequest": {
+            "type": "object",
+            "required": [
+                "refresh_token"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string",
+                    "example": "refresh_token"
+                }
+            }
+        },
+        "handler.RegisterOrganizationBodyRequest": {
+            "type": "object",
+            "required": [
+                "organization_code",
+                "organization_name",
+                "password",
+                "user_email",
+                "user_name"
+            ],
+            "properties": {
+                "organization_code": {
+                    "type": "string",
+                    "example": "my_organization_code"
+                },
+                "organization_name": {
+                    "type": "string",
+                    "example": "My Organization"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "password"
+                },
+                "user_email": {
+                    "type": "string",
+                    "example": "example@example.com"
+                },
+                "user_name": {
+                    "type": "string",
+                    "example": "山田太郎"
+                }
+            }
+        },
+        "handler.StartTimerRequest": {
+            "type": "object",
+            "required": [
+                "projectID",
+                "title"
+            ],
+            "properties": {
+                "memo": {
+                    "type": "string",
+                    "example": "timer memo"
+                },
+                "projectID": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Start"
+                }
+            }
+        },
+        "handler.UserCreateBodyRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "role"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "example@example.com"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "山田太郎"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "password"
+                },
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "admin",
+                        "member"
+                    ],
+                    "example": "admin"
+                }
+            }
+        },
+        "handler.UserUpdateBodyRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "role"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "example@example.com"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "山田太郎"
+                },
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "admin",
+                        "member"
+                    ],
+                    "example": "admin"
+                }
+            }
+        },
+        "presenter.AuthLoginResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string",
+                    "example": "access_token"
+                },
+                "expires_at": {
+                    "type": "string",
+                    "example": "2020-09-29T23:59:59Z"
+                },
+                "refresh_token": {
+                    "type": "string",
+                    "example": "refresh_token"
+                }
+            }
+        },
+        "presenter.AuthRefreshTokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string",
+                    "example": "access_token"
+                },
+                "expires_at": {
+                    "type": "string",
+                    "example": "2020-09-29T23:59:59Z"
+                },
+                "refresh_token": {
+                    "type": "string",
+                    "example": "refresh_token"
+                }
+            }
+        },
+        "presenter.BudgetCreateResponse": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "endMonth": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "memo": {
+                    "type": "string"
+                },
+                "projectID": {
+                    "type": "integer"
+                },
+                "startMonth": {
+                    "type": "string"
+                }
+            }
+        },
+        "presenter.BudgetGetResponse": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "endMonth": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "memo": {
+                    "type": "string"
+                },
+                "projectName": {
+                    "type": "string"
+                },
+                "projectUnitPrice": {
+                    "type": "integer"
+                },
+                "startMonth": {
+                    "type": "string"
+                }
+            }
+        },
+        "presenter.BudgetResponse": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "endMonth": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "memo": {
+                    "type": "string"
+                },
+                "projectID": {
+                    "type": "integer"
+                },
+                "startMonth": {
+                    "type": "string"
+                }
+            }
+        },
+        "presenter.BudgetUpdateResponse": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "endMonth": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "memo": {
+                    "type": "string"
+                },
+                "projectID": {
+                    "type": "integer"
+                },
+                "startMonth": {
+                    "type": "string"
+                }
+            }
+        },
+        "presenter.CustomerCreateResponse": {
+            "type": "object",
+            "properties": {
+                "endDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "unitPrice": {
+                    "type": "integer"
+                }
+            }
+        },
+        "presenter.CustomerGetResponse": {
+            "type": "object",
+            "properties": {
+                "endDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "unitPrice": {
+                    "type": "integer"
+                }
+            }
+        },
+        "presenter.CustomerResponse": {
+            "type": "object",
+            "properties": {
+                "endDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "unitPrice": {
+                    "type": "integer"
+                }
+            }
+        },
+        "presenter.CustomerUpdateResponse": {
+            "type": "object",
+            "properties": {
+                "endDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "unitPrice": {
+                    "type": "integer"
+                }
+            }
+        },
+        "presenter.OrganizationRegisterResponse": {
+            "type": "object",
+            "properties": {
+                "organization_code": {
+                    "type": "string",
+                    "example": "my_organization_code"
+                },
+                "organization_name": {
+                    "type": "string",
+                    "example": "My Organization"
+                }
+            }
+        },
+        "presenter.ProjectCreateResponse": {
+            "type": "object",
+            "properties": {
+                "customerID": {
+                    "type": "integer"
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "unitPrice": {
+                    "type": "integer"
+                }
+            }
+        },
+        "presenter.ProjectGetResponse": {
+            "type": "object",
+            "properties": {
+                "customerID": {
+                    "type": "integer"
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "unitPrice": {
+                    "type": "integer"
+                }
+            }
+        },
+        "presenter.ProjectResponse": {
+            "type": "object",
+            "properties": {
+                "customerID": {
+                    "type": "integer"
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "unitPrice": {
+                    "type": "integer"
+                }
+            }
+        },
+        "presenter.ProjectUpdateResponse": {
+            "type": "object",
+            "properties": {
+                "customerID": {
+                    "type": "integer"
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "unitPrice": {
+                    "type": "integer"
+                }
+            }
+        },
+        "presenter.StartTimerResponse": {
+            "type": "object",
+            "properties": {
+                "endAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "memo": {
+                    "type": "string"
+                },
+                "projectID": {
+                    "type": "integer"
+                },
+                "startAt": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "presenter.UserCreateResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "password"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "山田太郎"
+                },
+                "role": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entities.Role"
+                        }
+                    ],
+                    "example": "admin"
+                }
+            }
+        },
+        "presenter.UserGetResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "password"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "山田太郎"
+                },
+                "role": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entities.Role"
+                        }
+                    ],
+                    "example": "admin"
+                }
+            }
+        },
+        "presenter.UserResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "password"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "山田太郎"
+                },
+                "role": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entities.Role"
+                        }
+                    ],
+                    "example": "admin"
+                }
+            }
+        },
+        "presenter.UserUpdateResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "password"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "山田太郎"
+                },
+                "role": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entities.Role"
+                        }
+                    ],
+                    "example": "admin"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

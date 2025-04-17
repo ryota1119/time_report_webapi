@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="time_report_db" schema="time_report_db" type="MySQL - 9.2.0">
+   <tables>
+      <table catalog="time_report_db" name="atlas_schema_revisions" numRows="0" remarks="" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="version" nullable="false" remarks="" size="255" type="VARCHAR" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="description" nullable="false" remarks="" size="255" type="VARCHAR" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="2" digits="0" id="2" name="type" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="3" name="applied" nullable="false" remarks="" size="19" type="BIGINT" typeCode="-5"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="total" nullable="false" remarks="" size="19" type="BIGINT" typeCode="-5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="executed_at" nullable="false" remarks="" size="19" type="TIMESTAMP" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="execution_time" nullable="false" remarks="" size="19" type="BIGINT" typeCode="-5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="7" name="error" nullable="true" remarks="" size="2147483647" type="LONGTEXT" typeCode="-1"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="8" name="error_stmt" nullable="true" remarks="" size="2147483647" type="LONGTEXT" typeCode="-1"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="hash" nullable="false" remarks="" size="255" type="VARCHAR" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="partial_hashes" nullable="true" remarks="" size="1073741824" type="JSON" typeCode="-1"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="operator_version" nullable="false" remarks="" size="255" type="VARCHAR" typeCode="12"/>
+         <primaryKey column="version" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="version"/>
+         </index>
+      </table>
+      <table catalog="time_report_db" name="budgets" numRows="0" remarks="" type="TABLE">
+         <column autoUpdated="true" defaultValue="null" digits="0" id="0" name="id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="organization_id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
+            <parent catalog="time_report_db" column="id" foreignKey="fk_organizations_budgets" implied="false" onDeleteCascade="true" table="organizations"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="project_id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
+            <parent catalog="time_report_db" column="id" foreignKey="fk_projects_budgets" implied="false" onDeleteCascade="true" table="projects"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="amount" nullable="false" remarks="" size="19" type="BIGINT" typeCode="-5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="memo" nullable="true" remarks="" size="65535" type="TEXT" typeCode="-1"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="start_date" nullable="true" remarks="" size="10" type="DATE" typeCode="91"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="end_date" nullable="true" remarks="" size="10" type="DATE" typeCode="91"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="7" name="created_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="8" name="updated_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="idx_budgets_organization_id" unique="false">
+            <column ascending="true" name="organization_id"/>
+         </index>
+         <index name="idx_budgets_project_id" unique="false">
+            <column ascending="true" name="project_id"/>
+         </index>
+      </table>
+      <table catalog="time_report_db" name="customers" numRows="0" remarks="" type="TABLE">
+         <column autoUpdated="true" defaultValue="null" digits="0" id="0" name="id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
+            <child catalog="time_report_db" column="customer_id" foreignKey="fk_customers_projects" implied="false" onDeleteCascade="true" table="projects"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="organization_id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
+            <parent catalog="time_report_db" column="id" foreignKey="fk_organizations_customers" implied="false" onDeleteCascade="true" table="organizations"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="name" nullable="false" remarks="" size="2147483647" type="LONGTEXT" typeCode="-1"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="unit_price" nullable="true" remarks="" size="19" type="BIGINT" typeCode="-5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="start_date" nullable="true" remarks="" size="10" type="DATE" typeCode="91"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="end_date" nullable="true" remarks="" size="10" type="DATE" typeCode="91"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="created_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="7" name="updated_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="8" name="deleted_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="idx_customers_deleted_at" unique="false">
+            <column ascending="true" name="deleted_at"/>
+         </index>
+         <index name="idx_customers_organization_id" unique="false">
+            <column ascending="true" name="organization_id"/>
+         </index>
+      </table>
+      <table catalog="time_report_db" name="organizations" numRows="0" remarks="" type="TABLE">
+         <column autoUpdated="true" defaultValue="null" digits="0" id="0" name="id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
+            <child catalog="time_report_db" column="organization_id" foreignKey="fk_organizations_budgets" implied="false" onDeleteCascade="true" table="budgets"/>
+            <child catalog="time_report_db" column="organization_id" foreignKey="fk_organizations_customers" implied="false" onDeleteCascade="true" table="customers"/>
+            <child catalog="time_report_db" column="organization_id" foreignKey="fk_organizations_projects" implied="false" onDeleteCascade="true" table="projects"/>
+            <child catalog="time_report_db" column="organization_id" foreignKey="fk_organizations_timer" implied="false" onDeleteCascade="true" table="timers"/>
+            <child catalog="time_report_db" column="organization_id" foreignKey="fk_organizations_users" implied="false" onDeleteCascade="true" table="users"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="organization_name" nullable="false" remarks="" size="2147483647" type="LONGTEXT" typeCode="-1"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="organization_code" nullable="false" remarks="" size="191" type="VARCHAR" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="created_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="updated_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="uni_organizations_organization_code" unique="true">
+            <column ascending="true" name="organization_code"/>
+         </index>
+      </table>
+      <table catalog="time_report_db" name="projects" numRows="0" remarks="" type="TABLE">
+         <column autoUpdated="true" defaultValue="null" digits="0" id="0" name="id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
+            <child catalog="time_report_db" column="project_id" foreignKey="fk_projects_budgets" implied="false" onDeleteCascade="true" table="budgets"/>
+            <child catalog="time_report_db" column="project_id" foreignKey="fk_projects_timer" implied="false" onDeleteCascade="true" table="timers"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="organization_id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
+            <parent catalog="time_report_db" column="id" foreignKey="fk_organizations_projects" implied="false" onDeleteCascade="true" table="organizations"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="customer_id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
+            <parent catalog="time_report_db" column="id" foreignKey="fk_customers_projects" implied="false" onDeleteCascade="true" table="customers"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="name" nullable="false" remarks="" size="2147483647" type="LONGTEXT" typeCode="-1"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="unit_price" nullable="true" remarks="" size="19" type="BIGINT" typeCode="-5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="start_date" nullable="true" remarks="" size="10" type="DATE" typeCode="91"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="end_date" nullable="true" remarks="" size="10" type="DATE" typeCode="91"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="7" name="created_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="8" name="updated_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="deleted_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="idx_projects_customer_id" unique="false">
+            <column ascending="true" name="customer_id"/>
+         </index>
+         <index name="idx_projects_deleted_at" unique="false">
+            <column ascending="true" name="deleted_at"/>
+         </index>
+         <index name="idx_projects_organization_id" unique="false">
+            <column ascending="true" name="organization_id"/>
+         </index>
+      </table>
+      <table catalog="time_report_db" name="timers" numRows="0" remarks="" type="TABLE">
+         <column autoUpdated="true" defaultValue="null" digits="0" id="0" name="id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="organization_id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
+            <parent catalog="time_report_db" column="id" foreignKey="fk_organizations_timer" implied="false" onDeleteCascade="true" table="organizations"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="user_id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
+            <parent catalog="time_report_db" column="id" foreignKey="fk_users_timer" implied="false" onDeleteCascade="true" table="users"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="project_id" nullable="true" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
+            <parent catalog="time_report_db" column="id" foreignKey="fk_projects_timer" implied="false" onDeleteCascade="true" table="projects"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="title" nullable="true" remarks="" size="2147483647" type="LONGTEXT" typeCode="-1"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="memo" nullable="true" remarks="" size="2147483647" type="LONGTEXT" typeCode="-1"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="start_at" nullable="false" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="7" name="end_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="8" name="created_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="updated_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="idx_timers_end_at" unique="false">
+            <column ascending="true" name="end_at"/>
+         </index>
+         <index name="idx_timers_organization_id" unique="false">
+            <column ascending="true" name="organization_id"/>
+         </index>
+         <index name="idx_timers_project_id" unique="false">
+            <column ascending="true" name="project_id"/>
+         </index>
+         <index name="idx_timers_start_at" unique="false">
+            <column ascending="true" name="start_at"/>
+         </index>
+         <index name="idx_timers_user_id" unique="false">
+            <column ascending="true" name="user_id"/>
+         </index>
+      </table>
+      <table catalog="time_report_db" name="users" numRows="0" remarks="" type="TABLE">
+         <column autoUpdated="true" defaultValue="null" digits="0" id="0" name="id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
+            <child catalog="time_report_db" column="user_id" foreignKey="fk_users_timer" implied="false" onDeleteCascade="true" table="timers"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="organization_id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
+            <parent catalog="time_report_db" column="id" foreignKey="fk_organizations_users" implied="false" onDeleteCascade="true" table="organizations"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="name" nullable="false" remarks="" size="255" type="VARCHAR" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="email" nullable="false" remarks="" size="255" type="VARCHAR" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="role" nullable="false" remarks="" size="6" type="enum('admin', 'member')" typeCode="1"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="password" nullable="false" remarks="" size="255" type="VARCHAR" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="created_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="7" name="updated_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="8" name="deleted_at" nullable="true" remarks="" size="23" type="DATETIME" typeCode="93"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="idx_users_deleted_at" unique="false">
+            <column ascending="true" name="deleted_at"/>
+         </index>
+         <index name="idx_users_organization_id" unique="false">
+            <column ascending="true" name="organization_id"/>
+         </index>
+         <index name="uni_users_email" unique="true">
+            <column ascending="true" name="email"/>
+         </index>
+      </table>
+   </tables>
+</database>

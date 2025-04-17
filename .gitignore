@@ -22,6 +22,3 @@ tmp/*
 *.env.production
 *.env.test
 *.env.*
-
-#
-api

@@ -1,0 +1,1232 @@
+basePath: /api/v1
+definitions:
+  entities.Role:
+    enum:
+    - admin
+    - member
+    - unknown
+    type: string
+    x-enum-varnames:
+    - AdminRole
+    - MemberRole
+    - UnknownRole
+  handler.AuthLoginBodyRequest:
+    properties:
+      email:
+        example: example@example.com
+        type: string
+      organization_code:
+        example: my_organization_code
+        type: string
+      password:
+        example: password
+        type: string
+    required:
+    - email
+    - organization_code
+    - password
+    type: object
+  handler.BudgetUpdateBodyRequest:
+    properties:
+      amount:
+        example: 300000
+        type: integer
+      endMonth:
+        example: "2025-01-02"
+        type: string
+      memo:
+        example: budget memo
+        type: string
+      projectID:
+        example: 1
+        type: integer
+      startMonth:
+        example: "2020-01-01"
+        type: string
+    required:
+    - amount
+    - endMonth
+    - projectID
+    - startMonth
+    type: object
+  handler.CreateBudgetsRequest:
+    properties:
+      budgetAmount:
+        example: 300000
+        type: integer
+      budgetMemo:
+        example: budget memo
+        type: string
+      endDate:
+        example: 2025-01
+        type: string
+      projectID:
+        example: 1
+        type: integer
+      startDate:
+        example: 2020-01
+        type: string
+    required:
+    - budgetAmount
+    - projectID
+    type: object
+  handler.CreateCustomersBodyRequest:
+    properties:
+      endDate:
+        type: string
+      name:
+        type: string
+      startDate:
+        type: string
+      unitPrice:
+        type: integer
+    required:
+    - name
+    type: object
+  handler.CreateProjectsRequest:
+    properties:
+      customer_id:
+        type: integer
+      endDate:
+        type: string
+      name:
+        type: string
+      startDate:
+        type: string
+      unitPrice:
+        type: integer
+    required:
+    - customer_id
+    - name
+    type: object
+  handler.CustomerUpdateBodyRequest:
+    properties:
+      endDate:
+        type: string
+      name:
+        type: string
+      startDate:
+        type: string
+      unitPrice:
+        type: integer
+    required:
+    - name
+    type: object
+  handler.ProjectUpdateBodyRequest:
+    properties:
+      customer_id:
+        type: integer
+      endDate:
+        type: string
+      name:
+        type: string
+      startDate:
+        type: string
+      unitPrice:
+        type: integer
+    required:
+    - customer_id
+    type: object
+  handler.RefreshTokenAuthRequest:
+    properties:
+      refresh_token:
+        example: refresh_token
+        type: string
+    required:
+    - refresh_token
+    type: object
+  handler.RegisterOrganizationBodyRequest:
+    properties:
+      organization_code:
+        example: my_organization_code
+        type: string
+      organization_name:
+        example: My Organization
+        type: string
+      password:
+        example: password
+        type: string
+      user_email:
+        example: example@example.com
+        type: string
+      user_name:
+        example: 山田太郎
+        type: string
+    required:
+    - organization_code
+    - organization_name
+    - password
+    - user_email
+    - user_name
+    type: object
+  handler.StartTimerRequest:
+    properties:
+      memo:
+        example: timer memo
+        type: string
+      projectID:
+        example: 1
+        type: integer
+      title:
+        example: Start
+        type: string
+    required:
+    - projectID
+    - title
+    type: object
+  handler.UserCreateBodyRequest:
+    properties:
+      email:
+        example: example@example.com
+        type: string
+      name:
+        example: 山田太郎
+        type: string
+      password:
+        example: password
+        type: string
+      role:
+        enum:
+        - admin
+        - member
+        example: admin
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - role
+    type: object
+  handler.UserUpdateBodyRequest:
+    properties:
+      email:
+        example: example@example.com
+        type: string
+      name:
+        example: 山田太郎
+        type: string
+      role:
+        enum:
+        - admin
+        - member
+        example: admin
+        type: string
+    required:
+    - email
+    - name
+    - role
+    type: object
+  presenter.AuthLoginResponse:
+    properties:
+      access_token:
+        example: access_token
+        type: string
+      expires_at:
+        example: "2020-09-29T23:59:59Z"
+        type: string
+      refresh_token:
+        example: refresh_token
+        type: string
+    type: object
+  presenter.AuthRefreshTokenResponse:
+    properties:
+      access_token:
+        example: access_token
+        type: string
+      expires_at:
+        example: "2020-09-29T23:59:59Z"
+        type: string
+      refresh_token:
+        example: refresh_token
+        type: string
+    type: object
+  presenter.BudgetCreateResponse:
+    properties:
+      amount:
+        type: integer
+      endMonth:
+        type: string
+      id:
+        type: integer
+      memo:
+        type: string
+      projectID:
+        type: integer
+      startMonth:
+        type: string
+    type: object
+  presenter.BudgetGetResponse:
+    properties:
+      amount:
+        type: integer
+      endMonth:
+        type: string
+      id:
+        type: integer
+      memo:
+        type: string
+      projectName:
+        type: string
+      projectUnitPrice:
+        type: integer
+      startMonth:
+        type: string
+    type: object
+  presenter.BudgetResponse:
+    properties:
+      amount:
+        type: integer
+      endMonth:
+        type: string
+      id:
+        type: integer
+      memo:
+        type: string
+      projectID:
+        type: integer
+      startMonth:
+        type: string
+    type: object
+  presenter.BudgetUpdateResponse:
+    properties:
+      amount:
+        type: integer
+      endMonth:
+        type: string
+      id:
+        type: integer
+      memo:
+        type: string
+      projectID:
+        type: integer
+      startMonth:
+        type: string
+    type: object
+  presenter.CustomerCreateResponse:
+    properties:
+      endDate:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      startDate:
+        type: string
+      unitPrice:
+        type: integer
+    type: object
+  presenter.CustomerGetResponse:
+    properties:
+      endDate:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      startDate:
+        type: string
+      unitPrice:
+        type: integer
+    type: object
+  presenter.CustomerResponse:
+    properties:
+      endDate:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      startDate:
+        type: string
+      unitPrice:
+        type: integer
+    type: object
+  presenter.CustomerUpdateResponse:
+    properties:
+      endDate:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      startDate:
+        type: string
+      unitPrice:
+        type: integer
+    type: object
+  presenter.OrganizationRegisterResponse:
+    properties:
+      organization_code:
+        example: my_organization_code
+        type: string
+      organization_name:
+        example: My Organization
+        type: string
+    type: object
+  presenter.ProjectCreateResponse:
+    properties:
+      customerID:
+        type: integer
+      endDate:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      startDate:
+        type: string
+      unitPrice:
+        type: integer
+    type: object
+  presenter.ProjectGetResponse:
+    properties:
+      customerID:
+        type: integer
+      endDate:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      startDate:
+        type: string
+      unitPrice:
+        type: integer
+    type: object
+  presenter.ProjectResponse:
+    properties:
+      customerID:
+        type: integer
+      endDate:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      startDate:
+        type: string
+      unitPrice:
+        type: integer
+    type: object
+  presenter.ProjectUpdateResponse:
+    properties:
+      customerID:
+        type: integer
+      endDate:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      startDate:
+        type: string
+      unitPrice:
+        type: integer
+    type: object
+  presenter.StartTimerResponse:
+    properties:
+      endAt:
+        type: string
+      id:
+        type: integer
+      memo:
+        type: string
+      projectID:
+        type: integer
+      startAt:
+        type: string
+      title:
+        type: string
+    type: object
+  presenter.UserCreateResponse:
+    properties:
+      email:
+        example: password
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: 山田太郎
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/entities.Role'
+        example: admin
+    type: object
+  presenter.UserGetResponse:
+    properties:
+      email:
+        example: password
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: 山田太郎
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/entities.Role'
+        example: admin
+    type: object
+  presenter.UserResponse:
+    properties:
+      email:
+        example: password
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: 山田太郎
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/entities.Role'
+        example: admin
+    type: object
+  presenter.UserUpdateResponse:
+    properties:
+      email:
+        example: password
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: 山田太郎
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/entities.Role'
+        example: admin
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Time Report WebAPIのSwaggerドキュメント
+  termsOfService: http://example.com/terms/
+  title: Time Report WebAPI
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: ユーザーログインを行う
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/handler.AuthLoginBodyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/presenter.AuthLoginResponse'
+        "400":
+          description: BadRequest
+      summary: Login
+      tags:
+      - auth
+  /auth/logout:
+    delete:
+      consumes:
+      - application/json
+      description: ログアウトを行う
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: logged out
+          schema:
+            type: string
+        "400":
+          description: BadRequest
+      security:
+      - BearerAuth: []
+      summary: Logout
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: リフレッシュトークンを利用してアクセストークンを再生成を行う
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/handler.RefreshTokenAuthRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/presenter.AuthRefreshTokenResponse'
+        "400":
+          description: BadRequest
+      summary: RefreshToken
+      tags:
+      - auth
+  /budgets:
+    get:
+      consumes:
+      - application/json
+      description: 予算一覧を返却する
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/presenter.BudgetResponse'
+              type: array
+            type: array
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: List Budgets
+      tags:
+      - budget
+    post:
+      consumes:
+      - application/json
+      description: 予算を新規作成する
+      parameters:
+      - description: budget create payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateBudgetsRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/presenter.BudgetCreateResponse'
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Create Budget
+      tags:
+      - budget
+  /budgets/{budgetID}:
+    delete:
+      consumes:
+      - application/json
+      description: 予算情報を削除する
+      parameters:
+      - example: 1
+        in: path
+        name: budgetID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Delete Budget
+      tags:
+      - budget
+    get:
+      consumes:
+      - application/json
+      description: 予算情報を返却する
+      parameters:
+      - example: 1
+        in: path
+        name: budgetID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/presenter.BudgetGetResponse'
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Get Budget
+      tags:
+      - budget
+    put:
+      consumes:
+      - application/json
+      description: 予算情報を更新する
+      parameters:
+      - example: 1
+        in: path
+        name: budgetID
+        required: true
+        type: integer
+      - description: update budgets payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/handler.BudgetUpdateBodyRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/presenter.BudgetUpdateResponse'
+        "204":
+          description: NoContent
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Update Budget
+      tags:
+      - budget
+  /customers:
+    get:
+      consumes:
+      - application/json
+      description: 顧客一覧を返却する
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/presenter.CustomerResponse'
+              type: array
+            type: array
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: List Customers
+      tags:
+      - customer
+    post:
+      consumes:
+      - application/json
+      description: 顧客を新規作成する
+      parameters:
+      - description: 組織新規作成APIのペイロード
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateCustomersBodyRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/presenter.CustomerCreateResponse'
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Create Customer
+      tags:
+      - customer
+  /customers/{customerID}:
+    delete:
+      consumes:
+      - application/json
+      description: 顧客情報を削除する
+      parameters:
+      - example: 1
+        in: path
+        name: customerID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Delete Customer
+      tags:
+      - customer
+    get:
+      consumes:
+      - application/json
+      description: 顧客情報を返却する
+      parameters:
+      - example: 1
+        in: path
+        name: customerID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/presenter.CustomerGetResponse'
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Get Customer
+      tags:
+      - customer
+    put:
+      consumes:
+      - application/json
+      description: 顧客情報を更新する
+      parameters:
+      - example: 1
+        in: path
+        name: customerID
+        required: true
+        type: integer
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CustomerUpdateBodyRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/presenter.CustomerUpdateResponse'
+        "204":
+          description: NoContent
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Update Customer
+      tags:
+      - customer
+  /organization:
+    get:
+      consumes:
+      - application/json
+      description: 組織情報を取得する
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/presenter.OrganizationRegisterResponse'
+        "400":
+          description: BadRequest
+        "404":
+          description: NotFound
+      summary: GetOrganization
+      tags:
+      - organization
+  /organization/register:
+    post:
+      consumes:
+      - application/json
+      description: 組織と管理者ユーザーを新規作成する
+      parameters:
+      - description: 組織と管理者ユーザーを新規作成するボディリクエスト
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/handler.RegisterOrganizationBodyRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/presenter.OrganizationRegisterResponse'
+        "400":
+          description: BadRequest
+      summary: Register
+      tags:
+      - organization
+  /projects:
+    get:
+      consumes:
+      - application/json
+      description: プロジェクト一覧を返却する
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/presenter.ProjectResponse'
+              type: array
+            type: array
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: List Projects
+      tags:
+      - project
+    post:
+      consumes:
+      - application/json
+      description: プロジェクトを新規作成する
+      parameters:
+      - description: project create payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateProjectsRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/presenter.ProjectCreateResponse'
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Create Project
+      tags:
+      - project
+  /projects/{projectID}:
+    delete:
+      consumes:
+      - application/json
+      description: プロジェクト情報を削除する
+      parameters:
+      - example: 1
+        in: path
+        name: projectID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Delete Project
+      tags:
+      - project
+    get:
+      consumes:
+      - application/json
+      description: プロジェクト情報を返却する
+      parameters:
+      - example: 1
+        in: path
+        name: projectID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/presenter.ProjectGetResponse'
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Get Project
+      tags:
+      - project
+    put:
+      consumes:
+      - application/json
+      description: プロジェクト情報を更新する
+      parameters:
+      - example: 1
+        in: path
+        name: projectID
+        required: true
+        type: integer
+      - description: update projects payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/handler.ProjectUpdateBodyRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/presenter.ProjectUpdateResponse'
+        "204":
+          description: NoContent
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Update Project
+      tags:
+      - project
+  /timers/start:
+    post:
+      consumes:
+      - application/json
+      description: タイマーを開始する
+      parameters:
+      - description: start timer payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.StartTimerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/presenter.StartTimerResponse'
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Start Timer
+      tags:
+      - Timer
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: ユーザー一覧を返却する
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/presenter.UserResponse'
+              type: array
+            type: array
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: List Users
+      tags:
+      - user
+    post:
+      consumes:
+      - application/json
+      description: ユーザーを新規作成する
+      parameters:
+      - description: ユーザー新規作成APIのペイロード
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UserCreateBodyRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/presenter.UserCreateResponse'
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Create User
+      tags:
+      - user
+  /users/{userID}:
+    delete:
+      consumes:
+      - application/json
+      description: ユーザー情報を削除する
+      parameters:
+      - example: 1
+        in: path
+        name: userID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Delete User
+      tags:
+      - user
+    get:
+      consumes:
+      - application/json
+      description: ユーザー情報を返却する
+      parameters:
+      - example: 1
+        in: path
+        name: userID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/presenter.UserGetResponse'
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: Get User
+      tags:
+      - user
+    put:
+      consumes:
+      - application/json
+      description: ユーザー情報を更新する
+      parameters:
+      - example: 1
+        in: path
+        name: userID
+        required: true
+        type: integer
+      - description: payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UserUpdateBodyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/presenter.UserUpdateResponse'
+        "204":
+          description: NoContent
+        "400":
+          description: BadRequest
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      security:
+      - BearerAuth: []
+      summary: Update User
+      tags:
+      - user
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

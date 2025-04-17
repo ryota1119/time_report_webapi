@@ -1,0 +1,5 @@
+date=2025-04-17 05:40:59+0000
+os=Linux 6.10.14-linuxkit
+schemaspy-version=7.0.0-SNAPSHOT
+schemaspy-revision=68b3190d0baae3de1d9e5d31b9fe6e41a6e4ad20
+renderer=Graphviz dot 2.43.0 

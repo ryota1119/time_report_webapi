@@ -91,6 +91,7 @@ func main() {
 	budgetUpdateUsecase := usecase.NewBudgetUpdateUsecase(db, budgetRepo)
 	budgetDeleteUsecase := usecase.NewBudgetDeleteUsecase(db, budgetRepo)
 	timerStartUsecase := usecase.NewTimerStartUsecase(db, timerRepo)
+	timerStopUsecase := usecase.NewTimerStopUsecase(db, timerRepo)
 
 	// Handler層のセットアップ
 	authHandler := handler.NewAuthHandler(authLoginUsecase, authRefreshTokenUsecase, authLogoutUsecase)
@@ -99,7 +100,7 @@ func main() {
 	customerHandler := handler.NewCustomerHandler(customerUsecase)
 	projectHandler := handler.NewProjectHandler(projectUsecase)
 	budgetHandler := handler.NewBudgetHandler(budgetCreateUsecase, budgetListUsecase, budgetGetUsecase, budgetUpdateUsecase, budgetDeleteUsecase)
-	timerHandler := handler.NewTimerHandler(timerStartUsecase)
+	timerHandler := handler.NewTimerHandler(timerStartUsecase, timerStopUsecase)
 
 	// infrastructure/auth Service層のセットアップ
 	authService := auth.NewAuthService(db, redisClient, jwtToken, authRepo, organizationRepo, userRepo)

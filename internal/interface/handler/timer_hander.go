@@ -12,19 +12,23 @@ var _ TimerHandler = (*timerHandler)(nil)
 // TimerHandler は timerHandler のインターフェース
 type TimerHandler interface {
 	Start(c *gin.Context)
+	Stop(c *gin.Context)
 }
 
 // timerHandler の実装
 type timerHandler struct {
 	timerStartUsecase usecase.TimerStartUsecase
+	timerStopUsecase  usecase.TimerStopUsecase
 }
 
 // NewTimerHandler は timerHandler の初期化を行う
 func NewTimerHandler(
 	timerStartUsecase usecase.TimerStartUsecase,
+	timerStopUsecase usecase.TimerStopUsecase,
 ) TimerHandler {
 	return &timerHandler{
 		timerStartUsecase: timerStartUsecase,
+		timerStopUsecase:  timerStopUsecase,
 	}
 }
 
@@ -47,7 +51,6 @@ type StartTimerRequest struct {
 //	@Success		201	{object}	presenter.StartTimerResponse
 //	@Failure		400	{object}	nil	"BadRequest"
 //	@Failure		401	{object}	nil	"Unauthorized"
-//	@Failure		403	{object}	nil	"Forbidden"
 //	@Router			/timers/start [POST]
 func (h *timerHandler) Start(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -69,5 +72,44 @@ func (h *timerHandler) Start(c *gin.Context) {
 	}
 
 	res := presenter.NewStartTimerResponse(timer)
+	c.JSON(http.StatusCreated, res)
+}
+
+// StopTimerURIRequest はタイマー終了時のURIパラメータ
+type StopTimerURIRequest struct {
+	ID uint `uri:"timerID" binding:"required" example:"1"`
+}
+
+// Stop はタイマーを終了する
+//
+//	@Summary		Stop Timer
+//	@Description	タイマーを終了する
+//	@Tags			Timer
+//	@Security		BearerAuth
+//	@Param			request	path	StopTimerURIRequest	true	"stop timer uri parameter"
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	presenter.StartTimerResponse
+//	@Failure		400	{object}	nil	"BadRequest"
+//	@Failure		401	{object}	nil	"Unauthorized"
+//	@Router			/timers/{timerID}/stop [POST]
+func (h *timerHandler) Stop(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	var req StopTimerURIRequest
+	err := c.ShouldBindUri(&req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	input := usecase.TimerStopUsecaseInput{
+		TimerID: req.ID,
+	}
+	timer, err := h.timerStopUsecase.Stop(ctx, input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+
+	res := presenter.NewStopTimerResponse(timer)
 	c.JSON(http.StatusOK, res)
 }

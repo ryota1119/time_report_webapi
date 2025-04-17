@@ -150,5 +150,6 @@ func (r *Router) setupTimerRoutes(group *gin.RouterGroup) {
 	timerGroup := group.Group("/timers").Use(r.authMiddleware.AuthMiddleware())
 	{
 		timerGroup.POST("start", r.timerHandler.Start)
+		timerGroup.POST("/:timerID/stop", r.timerHandler.Stop)
 	}
 }

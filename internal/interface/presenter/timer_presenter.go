@@ -37,3 +37,29 @@ func NewStartTimerResponse(timer *entities.Timer) StartTimerResponse {
 		EndAt:     endAt,
 	}
 }
+
+type StopTimerResponse struct {
+	ID        uint      `json:"id"`
+	ProjectID uint      `json:"projectID"`
+	Title     string    `json:"title"`
+	Memo      *string   `json:"memo,omitempty"`
+	StartAt   time.Time `json:"startAt"`
+	EndAt     time.Time `json:"endAt"`
+}
+
+func NewStopTimerResponse(timer *entities.Timer) StopTimerResponse {
+	var memo *string
+	if timer.Memo != nil {
+		c := timer.Memo.String()
+		memo = &c
+	}
+
+	return StopTimerResponse{
+		ID:        timer.ID.Uint(),
+		ProjectID: timer.ProjectID.Uint(),
+		Title:     timer.Title.String(),
+		Memo:      memo,
+		StartAt:   timer.StartAt.Time(),
+		EndAt:     timer.EndAt.Time(),
+	}
+}

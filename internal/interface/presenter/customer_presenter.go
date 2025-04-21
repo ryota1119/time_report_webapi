@@ -1,17 +1,15 @@
 package presenter
 
 import (
-	"time"
-
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
 type CustomerResponse struct {
 	ID        entities.CustomerID
 	Name      entities.CustomerName
 	UnitPrice *entities.CustomerUnitPrice
-	StartDate *time.Time
-	EndDate   *time.Time
+	StartDate *string
+	EndDate   *string
 }
 
 type CustomerCreateResponse CustomerResponse
@@ -21,8 +19,8 @@ func NewCustomerCreateResponse(customer *entities.Customer) CustomerCreateRespon
 		ID:        customer.ID,
 		Name:      customer.Name,
 		UnitPrice: customer.UnitPrice,
-		StartDate: customer.StartDate,
-		EndDate:   customer.EndDate,
+		StartDate: customer.Period.Start.StringOrNil(),
+		EndDate:   customer.Period.End.StringOrNil(),
 	}
 }
 
@@ -35,8 +33,8 @@ func NewCustomerListResponse(customers []entities.Customer) []CustomerResponse {
 			ID:        customer.ID,
 			Name:      customer.Name,
 			UnitPrice: customer.UnitPrice,
-			StartDate: customer.StartDate,
-			EndDate:   customer.EndDate,
+			StartDate: customer.Period.Start.StringOrNil(),
+			EndDate:   customer.Period.End.StringOrNil(),
 		})
 	}
 	return output
@@ -49,8 +47,8 @@ func NewCustomerGetResponse(customer *entities.Customer) CustomerGetResponse {
 		ID:        customer.ID,
 		Name:      customer.Name,
 		UnitPrice: customer.UnitPrice,
-		StartDate: customer.StartDate,
-		EndDate:   customer.EndDate,
+		StartDate: customer.Period.Start.StringOrNil(),
+		EndDate:   customer.Period.End.StringOrNil(),
 	}
 }
 
@@ -61,7 +59,7 @@ func NewCustomerUpdateResponse(customer *entities.Customer) CustomerUpdateRespon
 		ID:        customer.ID,
 		Name:      customer.Name,
 		UnitPrice: customer.UnitPrice,
-		StartDate: customer.StartDate,
-		EndDate:   customer.EndDate,
+		StartDate: customer.Period.Start.StringOrNil(),
+		EndDate:   customer.Period.End.StringOrNil(),
 	}
 }

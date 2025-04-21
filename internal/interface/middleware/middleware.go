@@ -1,12 +1,13 @@
 package middleware
 
 import (
+	"log/slog"
+	"time"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/ryota1119/time_resport/internal/infrastructure/logger"
-	"log/slog"
-	"time"
+	"github.com/ryota1119/time_resport_webapi/internal/infrastructure/logger"
 )
 
 func Default() []gin.HandlerFunc {

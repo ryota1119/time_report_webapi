@@ -3,7 +3,7 @@ package presenter
 import (
 	"time"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
 // AuthResponse 認証APIの基本レスポンス構造体

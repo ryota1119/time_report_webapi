@@ -5,10 +5,9 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
-	"github.com/ryota1119/time_resport/internal/domain/errors"
-	"github.com/ryota1119/time_resport/internal/domain/repository"
-	"github.com/ryota1119/time_resport/internal/domain/service"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/service"
 )
 
 var _ AuthLoginUsecase = (*authLoginUsecase)(nil)
@@ -82,9 +81,8 @@ func (a *authLoginUsecase) Login(ctx context.Context, input AuthUsecaseLoginInpu
 	}
 
 	// パスワードの検証
-	err = user.HashedPassword.CheckHashedPassword(input.Password)
-	if err != nil {
-		return nil, errors.ErrPasswordNotMatch
+	if err = user.HashedPassword.CheckHashedPassword(input.Password); err != nil {
+		return nil, entities.ErrPasswordNotMatch
 	}
 
 	// アクセストークン生成

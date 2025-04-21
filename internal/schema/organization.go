@@ -3,7 +3,7 @@ package schema
 import (
 	"time"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
 type OrganizationID entities.OrganizationID

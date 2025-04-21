@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ryota1119/time_resport/internal/interface/presenter"
-	"github.com/ryota1119/time_resport/internal/usecase"
+	"github.com/ryota1119/time_resport_webapi/internal/interface/presenter"
+	"github.com/ryota1119/time_resport_webapi/internal/usecase"
 )
 
 // CustomerHandler はcustomerHandlerのインターフェース
@@ -20,17 +20,29 @@ type CustomerHandler interface {
 
 // customerHandler の実装
 type customerHandler struct {
-	customerUsecase usecase.CustomerUsecase
+	customerCreateUsecase     usecase.CustomerCreateUsecase
+	customerListUsecase       usecase.CustomerListUsecase
+	customerGetUsecase        usecase.CustomerGetUsecase
+	customerUpdateUsecase     usecase.CustomerUpdateUsecase
+	customerSoftDeleteUsecase usecase.CustomerSoftDeleteUsecase
 }
 
 var _ CustomerHandler = (*customerHandler)(nil)
 
 // NewCustomerHandler はcustomerHandlerの初期化を行う
 func NewCustomerHandler(
-	customerUsecase usecase.CustomerUsecase,
+	customerCreateUsecase usecase.CustomerCreateUsecase,
+	customerListUsecase usecase.CustomerListUsecase,
+	customerGetUsecase usecase.CustomerGetUsecase,
+	customerUpdateUsecase usecase.CustomerUpdateUsecase,
+	customerSoftDeleteUsecase usecase.CustomerSoftDeleteUsecase,
 ) CustomerHandler {
 	return &customerHandler{
-		customerUsecase: customerUsecase,
+		customerCreateUsecase:     customerCreateUsecase,
+		customerListUsecase:       customerListUsecase,
+		customerGetUsecase:        customerGetUsecase,
+		customerUpdateUsecase:     customerUpdateUsecase,
+		customerSoftDeleteUsecase: customerSoftDeleteUsecase,
 	}
 }
 
@@ -62,19 +74,19 @@ func (h *customerHandler) Create(c *gin.Context) {
 	var req CreateCustomersBodyRequest
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	input := usecase.CreateCustomerUsecaseInput{
+	input := usecase.CustomerCreateUsecaseInput{
 		Name:      req.Name,
 		UnitPrice: req.UnitPrice,
 		StartDate: req.StartDate,
 		EndDate:   req.EndDate,
 	}
-	customer, err := h.customerUsecase.Create(ctx, input)
+	customer, err := h.customerCreateUsecase.Create(ctx, input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -97,7 +109,7 @@ func (h *customerHandler) Create(c *gin.Context) {
 func (h *customerHandler) List(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	customers, err := h.customerUsecase.List(ctx)
+	customers, err := h.customerListUsecase.List(ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -129,16 +141,16 @@ func (h *customerHandler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 	var req CustomerGetURIRequest
 	if err := c.ShouldBindUri(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	input := usecase.GetCustomerUsecaseInput{
+	input := usecase.CustomerGetUsecaseInput{
 		CustomerID: req.CustomerID,
 	}
-	customer, err := h.customerUsecase.Get(ctx, input)
+	customer, err := h.customerGetUsecase.Get(ctx, input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -180,25 +192,25 @@ func (h *customerHandler) Update(c *gin.Context) {
 
 	var uriReq CustomerGetURIRequest
 	if err := c.ShouldBindUri(&uriReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var bodyReq CustomerUpdateBodyRequest
 	if err := c.ShouldBindJSON(&bodyReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	// 更新処理
-	input := usecase.UpdateCustomerUsecaseInput{
+	input := usecase.CustomerUpdateUsecaseInput{
 		CustomerID: uriReq.CustomerID,
 		Name:       bodyReq.Name,
 		UnitPrice:  bodyReq.UnitPrice,
 		StartDate:  bodyReq.StartDate,
 		EndDate:    bodyReq.EndDate,
 	}
-	customer, err := h.customerUsecase.Update(ctx, input)
+	customer, err := h.customerUpdateUsecase.Update(ctx, input)
 	if err != nil {
 		if errors.Is(err, errors.New("no update content")) {
 			c.JSON(http.StatusNoContent, nil)
@@ -234,16 +246,16 @@ func (h *customerHandler) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
 	var req CustomerDeleteURIRequest
 	if err := c.ShouldBindUri(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	input := usecase.SoftDeleteCustomerUsecaseInput{
+	input := usecase.CustomerSoftDeleteUsecaseInput{
 		CustomerID: req.CustomerID,
 	}
-	err := h.customerUsecase.SoftDelete(ctx, input)
+	err := h.customerSoftDeleteUsecase.SoftDelete(ctx, input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
 	c.JSON(http.StatusNoContent, nil)

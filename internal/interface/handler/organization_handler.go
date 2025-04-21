@@ -3,10 +3,10 @@ package handler
 import (
 	"net/http"
 
-	"github.com/ryota1119/time_resport/internal/interface/presenter"
+	"github.com/ryota1119/time_resport_webapi/internal/interface/presenter"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ryota1119/time_resport/internal/usecase"
+	"github.com/ryota1119/time_resport_webapi/internal/usecase"
 )
 
 // OrganizationHandler はorganizationHandlerのインターフェース
@@ -59,7 +59,7 @@ func (h *organizationHandler) Register(c *gin.Context) {
 	var req RegisterOrganizationBodyRequest
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -72,7 +72,7 @@ func (h *organizationHandler) Register(c *gin.Context) {
 	}
 	org, err := h.organizationRegisterUsecase.Register(ctx, input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -100,7 +100,7 @@ func (h *organizationHandler) GetOrganization(c *gin.Context) {
 	//		c.JSON(http.StatusNotFound, gin.H{"error": ErrNotFound.Error()})
 	//		return
 	//	}
-	//	c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+	//	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	//	return
 	//}
 	//

@@ -6,9 +6,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
-	"github.com/ryota1119/time_resport/internal/domain/repository"
-	"github.com/ryota1119/time_resport/internal/helper/auth_context"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
+	"github.com/ryota1119/time_resport_webapi/internal/helper/auth_context"
 )
 
 type UserRepository struct{}

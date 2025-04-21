@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 
-	"github.com/ryota1119/time_resport/internal/domain/repository"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
 )
 
 // AuthLogoutUsecase は authLogoutUsecase の抽象

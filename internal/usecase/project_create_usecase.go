@@ -2,14 +2,41 @@ package usecase
 
 import (
 	"context"
-	"errors"
+	"database/sql"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
-	"github.com/ryota1119/time_resport/internal/helper/datetime"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
-// CreateProjectUsecaseInput ProjectUsecase Createメソッド用input
-type CreateProjectUsecaseInput struct {
+var _ ProjectCreateUsecase = (*projectCreateUsecase)(nil)
+
+// ProjectCreateUsecase は usecase.projectCreateUsecase のインターフェースを定義
+type ProjectCreateUsecase interface {
+	Create(ctx context.Context, input ProjectCreateUsecaseInput) (*entities.Project, error)
+}
+
+// projectCreateUsecase ユースケース
+type projectCreateUsecase struct {
+	db           *sql.DB
+	projectRepo  repository.ProjectRepository
+	customerRepo repository.CustomerRepository
+}
+
+// NewProjectCreateUsecase は projectCreateUsecase を初期化する
+func NewProjectCreateUsecase(
+	db *sql.DB,
+	projectRepo repository.ProjectRepository,
+	customerRepo repository.CustomerRepository,
+) ProjectCreateUsecase {
+	return &projectCreateUsecase{
+		db:           db,
+		projectRepo:  projectRepo,
+		customerRepo: customerRepo,
+	}
+}
+
+// ProjectCreateUsecaseInput projectCreateUsecase.Createメソッド用input
+type ProjectCreateUsecaseInput struct {
 	CustomerID uint
 	Name       string
 	UnitPrice  *int64
@@ -18,7 +45,7 @@ type CreateProjectUsecaseInput struct {
 }
 
 // Create はプロジェクトを新規作成する
-func (a *projectUsecase) Create(ctx context.Context, input CreateProjectUsecaseInput) (*entities.Project, error) {
+func (a *projectCreateUsecase) Create(ctx context.Context, input ProjectCreateUsecaseInput) (*entities.Project, error) {
 	tx, err := a.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -31,24 +58,23 @@ func (a *projectUsecase) Create(ctx context.Context, input CreateProjectUsecaseI
 		}
 	}()
 
-	// StartDateとEndDateがnilでない場合、StartDateはEndDateより前である必要がある
-	// 開始日・終了日をパース
-	startDate, endDate, err := datetime.ParseStartEndDate(input.StartDate, input.EndDate)
+	// 顧客が存在するか確認
+	customerID := entities.CustomerID(input.CustomerID)
+	_, err = a.customerRepo.Find(ctx, tx, &customerID)
 	if err != nil {
 		return nil, err
-	}
-	if startDate != nil && endDate != nil {
-		if !startDate.Before(*endDate) {
-			return nil, errors.New("StartDate must be before EndDate")
-		}
 	}
 
 	// プロジェクトを作成する
-	project := entities.NewProject(input.CustomerID, input.Name, input.UnitPrice, startDate, endDate)
-	_, err = a.projectRepo.Create(ctx, tx, project)
+	project, err := entities.NewProject(input.CustomerID, input.Name, input.UnitPrice, input.StartDate, input.EndDate)
 	if err != nil {
 		return nil, err
 	}
+	projectID, err := a.projectRepo.Create(ctx, tx, project)
+	if err != nil {
+		return nil, err
+	}
+	project.ID = *projectID
 
 	return project, nil
 }

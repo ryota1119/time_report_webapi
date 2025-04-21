@@ -4,11 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	domainerrors "github.com/ryota1119/time_resport/internal/domain/errors"
 	"time"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
-	"github.com/ryota1119/time_resport/internal/domain/repository"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
 )
 
 type OrganizationRepository struct{}
@@ -75,7 +74,7 @@ func (r *OrganizationRepository) FindByCode(ctx context.Context, tx *sql.Tx, org
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, domainerrors.ErrOrganizationNotFound
+			return nil, entities.ErrOrganizationNotFound
 		}
 		return nil, err
 	}

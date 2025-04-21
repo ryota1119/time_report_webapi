@@ -5,9 +5,9 @@ import (
 	"database/sql"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/ryota1119/time_resport/internal/domain/entities"
-	"github.com/ryota1119/time_resport/internal/domain/repository"
-	"github.com/ryota1119/time_resport/internal/domain/service"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/service"
 )
 
 // Service AuthServiceのインターフェースを定義

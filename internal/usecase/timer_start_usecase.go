@@ -3,10 +3,11 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	"github.com/ryota1119/time_resport/internal/domain/repository"
 	"time"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
+
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
 var _ TimerStartUsecase = (*timerStartUsecase)(nil)
@@ -64,12 +65,12 @@ func (a *timerStartUsecase) Start(ctx context.Context, input TimerStartUsecaseIn
 
 	now := time.Now()
 	// 予算を作成する
-	timerRecord := entities.NewTimer(input.ProjectID, input.Title, input.Memo, now, nil)
-	storedTimerID, err := a.timerRepo.Create(ctx, tx, timerRecord)
+	timer := entities.NewTimer(input.ProjectID, input.Title, input.Memo, now, nil)
+	storedTimerID, err := a.timerRepo.Create(ctx, tx, timer)
 	if err != nil {
 		return nil, err
 	}
-	timerRecord.ID = *storedTimerID
+	timer.ID = *storedTimerID
 
-	return timerRecord, nil
+	return timer, nil
 }

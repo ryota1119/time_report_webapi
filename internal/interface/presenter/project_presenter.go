@@ -1,18 +1,17 @@
 package presenter
 
 import (
-	"time"
-
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/usecase/dto"
 )
 
 type ProjectResponse struct {
-	ID         entities.ProjectID
-	CustomerID entities.CustomerID
-	Name       entities.ProjectName
-	UnitPrice  *entities.ProjectUnitPrice
-	StartDate  *time.Time
-	EndDate    *time.Time
+	ID         entities.ProjectID         `json:"id"`
+	CustomerID entities.CustomerID        `json:"customerID"`
+	Name       entities.ProjectName       `json:"name"`
+	UnitPrice  *entities.ProjectUnitPrice `json:"unitPrice"`
+	StartDate  *string                    `json:"startDate"`
+	EndDate    *string                    `json:"endDate"`
 }
 
 type ProjectCreateResponse ProjectResponse
@@ -23,38 +22,52 @@ func NewProjectCreateResponse(project *entities.Project) ProjectCreateResponse {
 		CustomerID: project.CustomerID,
 		Name:       project.Name,
 		UnitPrice:  project.UnitPrice,
-		StartDate:  project.StartDate,
-		EndDate:    project.EndDate,
+		StartDate:  project.Period.Start.StringOrNil(),
+		EndDate:    project.Period.End.StringOrNil(),
 	}
 }
 
-type ProjectListResponse []ProjectResponse
+type ProjectListResponse struct {
+	ID           entities.ProjectID         `json:"id"`
+	CustomerName entities.CustomerName      `json:"customerName"`
+	Name         entities.ProjectName       `json:"name"`
+	UnitPrice    *entities.ProjectUnitPrice `json:"unitPrice"`
+	StartDate    *string                    `json:"startDate"`
+	EndDate      *string                    `json:"endDate"`
+}
 
-func NewProjectListResponse(projects []entities.Project) []ProjectResponse {
-	var output ProjectListResponse
+func NewProjectListResponse(projects []*dto.ProjectWithCustomer) []ProjectListResponse {
+	var output []ProjectListResponse
 	for _, project := range projects {
-		output = append(output, ProjectResponse{
-			ID:         project.ID,
-			CustomerID: project.CustomerID,
-			Name:       project.Name,
-			UnitPrice:  project.UnitPrice,
-			StartDate:  project.StartDate,
-			EndDate:    project.EndDate,
+		output = append(output, ProjectListResponse{
+			ID:           project.Project.ID,
+			CustomerName: project.Customer.Name,
+			Name:         project.Project.Name,
+			UnitPrice:    project.Project.UnitPrice,
+			StartDate:    project.Project.Period.Start.StringOrNil(),
+			EndDate:      project.Project.Period.End.StringOrNil(),
 		})
 	}
 	return output
 }
 
-type ProjectGetResponse ProjectResponse
+type ProjectGetResponse struct {
+	ID           entities.ProjectID         `json:"id"`
+	CustomerName entities.CustomerName      `json:"customerName"`
+	Name         entities.ProjectName       `json:"name"`
+	UnitPrice    *entities.ProjectUnitPrice `json:"unitPrice"`
+	StartDate    *string                    `json:"startDate"`
+	EndDate      *string                    `json:"endDate"`
+}
 
-func NewProjectGetResponse(project *entities.Project) ProjectGetResponse {
+func NewProjectGetResponse(project *dto.ProjectWithCustomer) ProjectGetResponse {
 	return ProjectGetResponse{
-		ID:         project.ID,
-		CustomerID: project.CustomerID,
-		Name:       project.Name,
-		UnitPrice:  project.UnitPrice,
-		StartDate:  project.StartDate,
-		EndDate:    project.EndDate,
+		ID:           project.Project.ID,
+		CustomerName: project.Customer.Name,
+		Name:         project.Project.Name,
+		UnitPrice:    project.Project.UnitPrice,
+		StartDate:    project.Project.Period.Start.StringOrNil(),
+		EndDate:      project.Project.Period.End.StringOrNil(),
 	}
 }
 
@@ -66,7 +79,7 @@ func NewProjectUpdateResponse(project *entities.Project) ProjectUpdateResponse {
 		CustomerID: project.CustomerID,
 		Name:       project.Name,
 		UnitPrice:  project.UnitPrice,
-		StartDate:  project.StartDate,
-		EndDate:    project.EndDate,
+		StartDate:  project.Period.Start.StringOrNil(),
+		EndDate:    project.Period.End.StringOrNil(),
 	}
 }

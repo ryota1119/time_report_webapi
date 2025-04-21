@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
 // OrganizationRepository OrganizationRepositoryのインターフェースを定義

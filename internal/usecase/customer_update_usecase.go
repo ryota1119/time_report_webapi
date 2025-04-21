@@ -2,14 +2,39 @@ package usecase
 
 import (
 	"context"
+	"database/sql"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
-	"github.com/ryota1119/time_resport/internal/domain/errors"
-	"github.com/ryota1119/time_resport/internal/helper/datetime"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
+
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
-// UpdateCustomerUsecaseInput は customerUsecase.Updateのinput
-type UpdateCustomerUsecaseInput struct {
+var _ CustomerUpdateUsecase = (*customerUpdateUsecase)(nil)
+
+// CustomerUpdateUsecase は usecase.customerUpdateUsecase のインターフェースを定義
+type CustomerUpdateUsecase interface {
+	// Update は顧客情報を更新する
+	Update(ctx context.Context, input CustomerUpdateUsecaseInput) (*entities.Customer, error)
+}
+
+// customerUpdateUsecase ユースケース
+type customerUpdateUsecase struct {
+	db           *sql.DB
+	customerRepo repository.CustomerRepository
+}
+
+func NewCustomerUpdateUsecase(
+	db *sql.DB,
+	customerRepo repository.CustomerRepository,
+) CustomerUpdateUsecase {
+	return &customerUpdateUsecase{
+		db:           db,
+		customerRepo: customerRepo,
+	}
+}
+
+// CustomerUpdateUsecaseInput は customerUsecase.Updateのinput
+type CustomerUpdateUsecaseInput struct {
 	CustomerID uint
 	Name       string
 	UnitPrice  *int64
@@ -18,7 +43,7 @@ type UpdateCustomerUsecaseInput struct {
 }
 
 // Update は顧客情報を更新する
-func (a *customerUsecase) Update(ctx context.Context, input UpdateCustomerUsecaseInput) (*entities.Customer, error) {
+func (a *customerUpdateUsecase) Update(ctx context.Context, input CustomerUpdateUsecaseInput) (*entities.Customer, error) {
 	tx, err := a.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -31,41 +56,47 @@ func (a *customerUsecase) Update(ctx context.Context, input UpdateCustomerUsecas
 		}
 	}()
 
-	// 既存の顧客情報を取得
 	customerID := entities.CustomerID(input.CustomerID)
 	customer, err := a.customerRepo.Find(ctx, tx, &customerID)
 	if err != nil {
-		return nil, errors.ErrCustomerNotFound
+		return nil, entities.ErrCustomerNotFound
 	}
 
-	// StartDateとEndDateがnilでない場合、StartDateはEndDateより前である必要がある
-	// 開始日・終了日をパース
-	startDate, endDate, err := datetime.ParseStartEndDate(input.StartDate, input.EndDate)
-	if err != nil {
-		return nil, err
-	}
-	if startDate != nil && endDate != nil {
-		if !startDate.Before(*endDate) {
-			return nil, errors.ErrStartDateMustBeBefore
-		}
-	}
-
-	// 何も更新がない場合は、エラーを返却し、handler層でno contentを返す
-	if customer.Name.String() == input.Name &&
-		customer.UnitPrice.Int64() == input.UnitPrice &&
-		customer.StartDate != startDate &&
-		customer.EndDate != endDate {
-		return nil, errors.ErrNoContentUpdated
-	}
-
-	newCustomer := entities.NewCustomer(input.Name, input.UnitPrice, startDate, endDate)
-	newCustomer.ID = customerID
-
-	// 顧客情報を更新する
-	err = a.customerRepo.Update(ctx, tx, newCustomer)
+	customerPeriod, err := entities.NewCustomerPeriod(input.StartDate, input.EndDate)
 	if err != nil {
 		return nil, err
 	}
 
-	return newCustomer, nil
+	isUpdated := false
+
+	if customer.Name != entities.CustomerName(input.Name) {
+		customer.Name = entities.CustomerName(input.Name)
+		isUpdated = true
+	}
+	if customer.UnitPrice != entities.NewCustomerUnitPrice(input.UnitPrice) {
+		customer.UnitPrice = entities.NewCustomerUnitPrice(input.UnitPrice)
+		isUpdated = true
+	}
+	if customer.Period.Start == nil && customerPeriod.Start != nil ||
+		customer.Period.Start != nil && customerPeriod.Start == nil ||
+		(customer.Period.Start != nil && customerPeriod.Start != nil && !customer.Period.Start.Equal(*customerPeriod.Start)) {
+		customer.Period.Start = customerPeriod.Start
+		isUpdated = true
+	}
+	if customer.Period.End == nil && customerPeriod.End != nil ||
+		customer.Period.End != nil && customerPeriod.End == nil ||
+		(customer.Period.End != nil && customerPeriod.End != nil && !customer.Period.End.Equal(*customerPeriod.End)) {
+		customer.Period.End = customerPeriod.End
+		isUpdated = true
+	}
+
+	if !isUpdated {
+		return nil, entities.ErrNoContentUpdated
+	}
+
+	if err := a.customerRepo.Update(ctx, tx, customer); err != nil {
+		return nil, err
+	}
+
+	return customer, nil
 }

@@ -1,21 +1,21 @@
 package main
 
 import (
-	"github.com/ryota1119/time_resport/internal/infrastructure/logger"
 	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/ryota1119/time_resport/internal/infrastructure/auth"
-	"github.com/ryota1119/time_resport/internal/infrastructure/database"
-	"github.com/ryota1119/time_resport/internal/infrastructure/jwt_token"
-	"github.com/ryota1119/time_resport/internal/infrastructure/redis"
-	"github.com/ryota1119/time_resport/internal/infrastructure/repository"
-	"github.com/ryota1119/time_resport/internal/interface/handler"
-	"github.com/ryota1119/time_resport/internal/interface/middleware"
-	"github.com/ryota1119/time_resport/internal/interface/router"
-	"github.com/ryota1119/time_resport/internal/usecase"
+	"github.com/ryota1119/time_resport_webapi/internal/infrastructure/auth"
+	"github.com/ryota1119/time_resport_webapi/internal/infrastructure/database"
+	"github.com/ryota1119/time_resport_webapi/internal/infrastructure/jwt_token"
+	"github.com/ryota1119/time_resport_webapi/internal/infrastructure/logger"
+	"github.com/ryota1119/time_resport_webapi/internal/infrastructure/redis"
+	"github.com/ryota1119/time_resport_webapi/internal/infrastructure/repository"
+	"github.com/ryota1119/time_resport_webapi/internal/interface/handler"
+	"github.com/ryota1119/time_resport_webapi/internal/interface/middleware"
+	"github.com/ryota1119/time_resport_webapi/internal/interface/router"
+	"github.com/ryota1119/time_resport_webapi/internal/usecase"
 )
 
 // @title						Time Report WebAPI
@@ -82,9 +82,21 @@ func main() {
 	authLogoutUsecase := usecase.NewAuthLogoutUsecase(authRepo)
 	organizationRegisterUsecase := usecase.NewOrganizationRegisterUsecase(db, organizationRepo, userRepo)
 	organizationGetByCodeUsecase := usecase.NewOrganizationGetByCodeUsecase(db, organizationRepo)
-	userUsecase := usecase.NewUserUsecase(db, userRepo)
-	customerUsecase := usecase.NewCustomerUsecase(db, customerRepo)
-	projectUsecase := usecase.NewProjectUsecase(db, projectRepo)
+	userCreateUsecase := usecase.NewUserCreateUsecase(db, userRepo)
+	userListUsecase := usecase.NewUserListUsecase(db, userRepo)
+	userGetUsecase := usecase.NewUserGetUsecase(db, userRepo)
+	userUpdateUsecase := usecase.NewUserUpdateUsecase(db, userRepo)
+	userSoftDeleteUsecase := usecase.NewUserSoftDeleteUsecase(db, userRepo)
+	customerCreateUsecase := usecase.NewCustomerCreateUsecase(db, customerRepo)
+	customerListUsecase := usecase.NewCustomerListUsecase(db, customerRepo)
+	customerGetUsecase := usecase.NewCustomerGetUsecase(db, customerRepo)
+	customerUpdateUsecase := usecase.NewCustomerUpdateUsecase(db, customerRepo)
+	customerSoftDeleteUsecase := usecase.NewCustomerSoftDeleteUsecase(db, customerRepo)
+	projectCreateUsecase := usecase.NewProjectCreateUsecase(db, projectRepo, customerRepo)
+	projectListUsecase := usecase.NewProjectListUsecase(db, projectRepo, customerRepo)
+	projectGetUsecase := usecase.NewProjectGetUsecase(db, projectRepo, customerRepo)
+	projectUpdateUsecase := usecase.NewProjectUpdateUsecase(db, projectRepo)
+	projectSoftDeleteUsecase := usecase.NewProjectSoftDeleteUsecase(db, projectRepo)
 	budgetCreateUsecase := usecase.NewBudgetCreateUsecase(db, budgetRepo)
 	budgetListUsecase := usecase.NewBudgetListUsecase(db, budgetRepo)
 	budgetGetUsecase := usecase.NewBudgetGetUsecase(db, budgetRepo)
@@ -96,9 +108,9 @@ func main() {
 	// Handler層のセットアップ
 	authHandler := handler.NewAuthHandler(authLoginUsecase, authRefreshTokenUsecase, authLogoutUsecase)
 	organizationHandler := handler.NewOrganizationHandler(organizationRegisterUsecase, organizationGetByCodeUsecase)
-	userHandler := handler.NewUserHandler(userUsecase)
-	customerHandler := handler.NewCustomerHandler(customerUsecase)
-	projectHandler := handler.NewProjectHandler(projectUsecase)
+	userHandler := handler.NewUserHandler(userCreateUsecase, userListUsecase, userGetUsecase, userUpdateUsecase, userSoftDeleteUsecase)
+	customerHandler := handler.NewCustomerHandler(customerCreateUsecase, customerListUsecase, customerGetUsecase, customerUpdateUsecase, customerSoftDeleteUsecase)
+	projectHandler := handler.NewProjectHandler(projectCreateUsecase, projectListUsecase, projectGetUsecase, projectUpdateUsecase, projectSoftDeleteUsecase)
 	budgetHandler := handler.NewBudgetHandler(budgetCreateUsecase, budgetListUsecase, budgetGetUsecase, budgetUpdateUsecase, budgetDeleteUsecase)
 	timerHandler := handler.NewTimerHandler(timerStartUsecase, timerStopUsecase)
 

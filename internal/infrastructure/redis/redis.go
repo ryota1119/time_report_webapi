@@ -3,8 +3,9 @@ package redis
 import (
 	"context"
 	"fmt"
-	"github.com/ryota1119/time_resport/internal/infrastructure/logger"
 	"os"
+
+	"github.com/ryota1119/time_resport_webapi/internal/infrastructure/logger"
 
 	"github.com/redis/go-redis/v9"
 )

@@ -2,6 +2,7 @@ package logger
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 )
@@ -38,6 +39,10 @@ func Info(msg string, args ...any) {
 
 func Warn(msg string, args ...any) {
 	log.Warn(msg, args...)
+}
+
+func Warnf(msg string, args ...interface{}) {
+	log.Warn(fmt.Sprintf(msg, args...))
 }
 
 func Error(msg string, args ...any) {

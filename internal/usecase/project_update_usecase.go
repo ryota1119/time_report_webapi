@@ -2,14 +2,39 @@ package usecase
 
 import (
 	"context"
+	"database/sql"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
-	"github.com/ryota1119/time_resport/internal/domain/errors"
-	"github.com/ryota1119/time_resport/internal/helper/datetime"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
+
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
-// UpdateProjectUsecaseInput ProjectUsecase Updateメソッド用input
-type UpdateProjectUsecaseInput struct {
+var _ ProjectUpdateUsecase = (*projectUpdateUsecase)(nil)
+
+// ProjectUpdateUsecase は usecase.projectUpdateUsecase のインターフェースを定義
+type ProjectUpdateUsecase interface {
+	Update(ctx context.Context, input ProjectUpdateUsecaseInput) (*entities.Project, error)
+}
+
+// projectUpdateUsecase ユースケース
+type projectUpdateUsecase struct {
+	db          *sql.DB
+	projectRepo repository.ProjectRepository
+}
+
+// NewProjectUpdateUsecase は projectUpdateUsecase を初期化する
+func NewProjectUpdateUsecase(
+	db *sql.DB,
+	projectRepo repository.ProjectRepository,
+) ProjectUpdateUsecase {
+	return &projectUpdateUsecase{
+		db:          db,
+		projectRepo: projectRepo,
+	}
+}
+
+// ProjectUpdateUsecaseInput ProjectUsecase Updateメソッド用input
+type ProjectUpdateUsecaseInput struct {
 	ProjectID  uint
 	CustomerID uint
 	Name       string
@@ -19,7 +44,7 @@ type UpdateProjectUsecaseInput struct {
 }
 
 // Update はプロジェクト情報を更新する
-func (a *projectUsecase) Update(ctx context.Context, input UpdateProjectUsecaseInput) (*entities.Project, error) {
+func (a *projectUpdateUsecase) Update(ctx context.Context, input ProjectUpdateUsecaseInput) (*entities.Project, error) {
 	tx, err := a.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -39,33 +64,45 @@ func (a *projectUsecase) Update(ctx context.Context, input UpdateProjectUsecaseI
 		return nil, err
 	}
 
-	// StartDateとEndDateがnilでない場合、StartDateはEndDateより前である必要がある
-	// 開始日・終了日をパース
-	startDate, endDate, err := datetime.ParseStartEndDate(input.StartDate, input.EndDate)
+	period, err := entities.NewProjectPeriod(input.StartDate, input.EndDate)
 	if err != nil {
 		return nil, err
 	}
-	if startDate != nil && endDate != nil {
-		if !startDate.Before(*endDate) {
-			return nil, errors.ErrStartDateMustBeBefore
-		}
+	unitPrice := entities.NewProjectUnitPrice(input.UnitPrice)
+
+	isUpdated := false
+
+	if project.Name != entities.ProjectName(input.Name) {
+		project.Name = entities.ProjectName(input.Name)
+		isUpdated = true
+	}
+	if project.UnitPrice != nil && unitPrice == nil ||
+		project.UnitPrice == nil && unitPrice != nil ||
+		project.UnitPrice != nil && unitPrice != nil {
+		project.UnitPrice = unitPrice
+		isUpdated = true
+	}
+	if project.Period.Start == nil && period.Start != nil ||
+		project.Period.Start != nil && period.Start == nil ||
+		(project.Period.Start != nil && period.Start != nil && !project.Period.Start.Equal(*period.Start)) {
+		project.Period.Start = period.Start
+		isUpdated = true
+	}
+	if project.Period.End == nil && period.End != nil ||
+		project.Period.End != nil && period.End == nil ||
+		(project.Period.End != nil && period.End != nil && !project.Period.End.Equal(*period.End)) {
+		project.Period.End = period.End
+		isUpdated = true
 	}
 
-	// 何も更新がない場合は、エラーを返却し、handler層でno contentを返す
-	if project.Name.String() == input.Name &&
-		project.StartDate != startDate &&
-		project.EndDate != endDate {
-		return nil, errors.ErrNoContentUpdated
+	if !isUpdated {
+		return nil, entities.ErrNoContentUpdated
 	}
-
-	newProject := entities.NewProject(input.CustomerID, input.Name, input.UnitPrice, startDate, endDate)
-	newProject.ID = projectID
 
 	// プロジェクト情報を更新する
-	_, err = a.projectRepo.Update(ctx, tx, project)
-	if err != nil {
+	if err = a.projectRepo.Update(ctx, tx, project); err != nil {
 		return nil, err
 	}
 
-	return newProject, nil
+	return project, nil
 }

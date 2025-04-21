@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ryota1119/time_resport/internal/helper/auth_context"
+	"github.com/ryota1119/time_resport_webapi/internal/helper/auth_context"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
-	"github.com/ryota1119/time_resport/internal/domain/repository"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -25,8 +25,8 @@ func NewAuthRepository(redisClient *redis.Client) repository.AuthRepository {
 }
 
 func (r *AuthRepository) SaveAccessToken(ctx context.Context, userID entities.UserID, jti *entities.Jti, duration time.Duration) error {
-	accessKey := "access:" + jti.String()
-	userAccessTokensKey := "user_access_tokens:" + userID.String()
+	accessKey := "login_users:access:" + jti.String()
+	userAccessTokensKey := "tokens:user_access_tokens:" + userID.String()
 
 	err := r.redisClient.Set(ctx, accessKey, userID.String(), duration).Err()
 	if err != nil {
@@ -58,8 +58,8 @@ func (r *AuthRepository) SaveAccessToken(ctx context.Context, userID entities.Us
 }
 
 func (r *AuthRepository) SaveRefreshToken(ctx context.Context, userID entities.UserID, jti *entities.Jti, duration time.Duration) error {
-	refreshKey := "refresh:" + jti.String()
-	userRefreshTokensKey := "user_refresh_tokens:" + userID.String()
+	refreshKey := "login_users:refresh:" + jti.String()
+	userRefreshTokensKey := "tokens:user_refresh_tokens:" + userID.String()
 
 	err := r.redisClient.Set(ctx, refreshKey, userID.String(), duration).Err()
 	if err != nil {
@@ -91,7 +91,7 @@ func (r *AuthRepository) SaveRefreshToken(ctx context.Context, userID entities.U
 }
 
 func (r *AuthRepository) GetUserIDByAccessJti(ctx context.Context, jti *entities.Jti) (*entities.UserID, error) {
-	userID, err := r.redisClient.Get(ctx, "access:"+jti.String()).Result()
+	userID, err := r.redisClient.Get(ctx, "login_users:access:"+jti.String()).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
 			return nil, entities.ErrTokenNotFoundInRedis
@@ -109,8 +109,8 @@ func (r *AuthRepository) GetUserIDByAccessJti(ctx context.Context, jti *entities
 	return &returnUserID, nil
 }
 
-func (r *AuthRepository) GetUserIDByRefreshToken(ctx context.Context, jti *entities.Jti) (*entities.UserID, error) {
-	userID, err := r.redisClient.Get(ctx, "refresh:"+jti.String()).Result()
+func (r *AuthRepository) GetUserIDByRefreshJti(ctx context.Context, jti *entities.Jti) (*entities.UserID, error) {
+	userID, err := r.redisClient.Get(ctx, "login_users:refresh:"+jti.String()).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
 			return nil, entities.ErrTokenNotFoundInRedis
@@ -131,13 +131,13 @@ func (r *AuthRepository) GetUserIDByRefreshToken(ctx context.Context, jti *entit
 func (r *AuthRepository) DeleteToken(ctx context.Context) error {
 	userID := auth_context.ContextOrganizationID(ctx)
 
-	accessTokensKey := "user_access_tokens:" + userID.String()
+	accessTokensKey := "tokens:user_access_tokens:" + userID.String()
 	accessTokens, err := r.redisClient.LRange(ctx, accessTokensKey, 0, -1).Result()
 	if err != nil {
 		return err
 	}
 	for _, accessToken := range accessTokens {
-		err := r.redisClient.Del(ctx, accessToken).Err()
+		err = r.redisClient.Del(ctx, accessToken).Err()
 		if err != nil {
 			return err
 		}
@@ -147,7 +147,7 @@ func (r *AuthRepository) DeleteToken(ctx context.Context) error {
 		return err
 	}
 
-	secretTokensKey := "user_refresh_tokens:" + userID.String()
+	secretTokensKey := "tokens:user_refresh_tokens:" + userID.String()
 	secretTokens, err := r.redisClient.LRange(ctx, secretTokensKey, 0, -1).Result()
 	if err != nil {
 		return err

@@ -1,4 +1,4 @@
-module github.com/ryota1119/time_resport
+module github.com/ryota1119/time_resport_webapi
 
 go 1.24.0
 

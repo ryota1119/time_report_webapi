@@ -2,17 +2,44 @@ package usecase
 
 import (
 	"context"
+	"database/sql"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
+
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
-// GetCustomerUsecaseInput は customerUsecase.Get のinput
-type GetCustomerUsecaseInput struct {
+var _ CustomerGetUsecase = (*customerGetUsecase)(nil)
+
+// CustomerGetUsecase は usecase.customerGetUsecase のインターフェースを定義
+type CustomerGetUsecase interface {
+	// Get は顧客情報を更新する
+	Get(ctx context.Context, input CustomerGetUsecaseInput) (*entities.Customer, error)
+}
+
+// customerGetUsecase ユースケース
+type customerGetUsecase struct {
+	db           *sql.DB
+	customerRepo repository.CustomerRepository
+}
+
+func NewCustomerGetUsecase(
+	db *sql.DB,
+	customerRepo repository.CustomerRepository,
+) CustomerGetUsecase {
+	return &customerGetUsecase{
+		db:           db,
+		customerRepo: customerRepo,
+	}
+}
+
+// CustomerGetUsecaseInput は customerUsecase.Get のinput
+type CustomerGetUsecaseInput struct {
 	CustomerID uint
 }
 
 // Get は顧客情報を取得する
-func (a *customerUsecase) Get(ctx context.Context, input GetCustomerUsecaseInput) (*entities.Customer, error) {
+func (a *customerGetUsecase) Get(ctx context.Context, input CustomerGetUsecaseInput) (*entities.Customer, error) {
 	tx, err := a.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err

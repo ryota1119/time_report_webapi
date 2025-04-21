@@ -6,10 +6,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/ryota1119/time_resport/internal/helper/auth_context"
+	"github.com/ryota1119/time_resport_webapi/internal/helper/auth_context"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
-	"github.com/ryota1119/time_resport/internal/domain/repository"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
 )
 
 type ProjectRepository struct{}
@@ -33,8 +33,8 @@ func (r *ProjectRepository) Create(ctx context.Context, tx *sql.Tx, project *ent
 		project.CustomerID,
 		project.Name,
 		project.UnitPrice,
-		project.StartDate,
-		project.EndDate,
+		project.Period.Start.Value(),
+		project.Period.End.Value(),
 		time.Now(),
 		time.Now(),
 	)
@@ -55,11 +55,10 @@ func (r *ProjectRepository) List(ctx context.Context, tx *sql.Tx) ([]entities.Pr
 	var projects []entities.Project
 	organizationID := auth_context.ContextOrganizationID(ctx)
 
-	query := "SELECT `p`.`id`, `p`.`customer_id`, `p`.`name`, `p`.`unit_price`, `p`.`start_date`, `p`.`end_date` " +
-		"FROM `projects` AS `p` " +
-		"LEFT JOIN `customers` AS `c` ON `p`.`customer_id` = `c`.`id` " +
-		"WHERE `c`.`organization_id` = ? " +
-		"`deleted_at` IS NULL"
+	query := "SELECT `id`, `customer_id`, `name`, `unit_price`, `start_date`, `end_date` " +
+		"FROM `projects` " +
+		"WHERE `organization_id` = ? " +
+		"AND `deleted_at` IS NULL"
 	rows, err := tx.QueryContext(
 		ctx,
 		query,
@@ -78,8 +77,8 @@ func (r *ProjectRepository) List(ctx context.Context, tx *sql.Tx) ([]entities.Pr
 			&project.CustomerID,
 			&project.Name,
 			&project.UnitPrice,
-			&project.StartDate,
-			&project.EndDate,
+			&project.Period.Start,
+			&project.Period.End,
 		)
 		if err != nil {
 			return nil, err
@@ -94,10 +93,9 @@ func (r *ProjectRepository) Find(ctx context.Context, tx *sql.Tx, projectID *ent
 
 	var project entities.Project
 
-	query := "SELECT `p`.`id`, `p`.`customer_id`, `p`.`name`, `p`.`unit_price`, `p`.`start_date`, `p`.`end_date` " +
-		"FROM `projects` AS `p` " +
-		"LEFT JOIN `customers` AS `c` ON `p`.`customer_id` = `c`.`id` " +
-		"WHERE `p`.`id` = ? AND `c`.`organization_id` = ? " +
+	query := "SELECT `id`, `customer_id`, `name`, `unit_price`, `start_date`, `end_date` " +
+		"FROM `projects` " +
+		"WHERE `id` = ? AND `organization_id` = ? " +
 		"AND `deleted_at` IS NULL"
 	result := tx.QueryRowContext(ctx, query, projectID, organizationID)
 	err := result.Scan(
@@ -105,8 +103,8 @@ func (r *ProjectRepository) Find(ctx context.Context, tx *sql.Tx, projectID *ent
 		&project.CustomerID,
 		&project.Name,
 		&project.UnitPrice,
-		&project.StartDate,
-		&project.EndDate,
+		&project.Period.Start,
+		&project.Period.End,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -118,45 +116,44 @@ func (r *ProjectRepository) Find(ctx context.Context, tx *sql.Tx, projectID *ent
 	return &project, nil
 }
 
-func (r *ProjectRepository) Update(ctx context.Context, tx *sql.Tx, project *entities.Project) (*entities.ProjectID, error) {
+func (r *ProjectRepository) Update(ctx context.Context, tx *sql.Tx, project *entities.Project) error {
 	organizationID := auth_context.ContextOrganizationID(ctx)
 
-	query := "UPDATE `projects` AS `p` " +
-		"SET `p`.`name` = ?, `p`.`unit_price` = ?, `p`.`start_date` = ?, `p`.`end_date` = ? ,  `p`.`updated_at` = ? " +
-		"LEFT JOIN `customers` AS `c` ON `p`.`customer_id` = `c`.`id` " +
-		"WHERE `p`.`id` = ? AND `c`.`organization_id` = ?"
-	result, err := tx.ExecContext(
-		ctx,
-		query,
-		&project.Name,
-		&project.UnitPrice,
-		&project.StartDate,
-		&project.EndDate,
-		time.Now(),
-		&project.ID,
-		&organizationID,
-	)
-	if err != nil {
-		return nil, err
-	}
-	lastInsertID, err := result.LastInsertId()
-	if err != nil {
-		return nil, err
-	}
-	projectID := entities.ProjectID(lastInsertID)
-
-	return &projectID, nil
-}
-
-func (r *ProjectRepository) Delete(ctx context.Context, tx *sql.Tx, projectID *entities.ProjectID) error {
-	organizationID := auth_context.ContextOrganizationID(ctx)
-
-	query := "DELETE FROM `projects` AS `p` " +
-		"LEFT JOIN `customers` AS `c` ON `p`.`customer_id` = `c`.`id` " +
-		"WHERE `p`.`id` = ? AND `c`.`organization_id` = ?"
+	query := "UPDATE `projects` " +
+		"SET `name` = ?, `unit_price` = ?, `start_date` = ?, `end_date` = ? ,  `updated_at` = ? " +
+		"WHERE `id` = ? AND `organization_id` = ? " +
+		"AND `deleted_at` IS NULL"
 	_, err := tx.ExecContext(
 		ctx,
 		query,
+		project.Name,
+		project.UnitPrice,
+		project.Period.Start.Value(),
+		project.Period.End.Value(),
+		time.Now(),
+		project.ID,
+		organizationID,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *ProjectRepository) SoftDelete(ctx context.Context, tx *sql.Tx, projectID *entities.ProjectID) error {
+	organizationID := auth_context.ContextOrganizationID(ctx)
+
+	query := "UPDATE `projects` " +
+		"SET `deleted_at` = ? ,  `updated_at` = ? " +
+		"WHERE `id` = ? " +
+		"AND `organization_id` = ? " +
+		"AND `deleted_at` IS NULL"
+	_, err := tx.ExecContext(
+		ctx,
+		query,
+		time.Now(),
+		time.Now(),
 		projectID,
 		organizationID,
 	)

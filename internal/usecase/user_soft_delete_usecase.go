@@ -2,19 +2,44 @@ package usecase
 
 import (
 	"context"
-	"errors"
+	"database/sql"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
-	"github.com/ryota1119/time_resport/internal/helper/auth_context"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/helper/auth_context"
 )
 
-// UserUsecaseSoftDeleteInput はuserUsecase.SoftDeleteのインプット
-type UserUsecaseSoftDeleteInput struct {
+var _ UserSoftDeleteUsecase = (*userSoftDeleteUsecase)(nil)
+
+// UserSoftDeleteUsecase は usecase.userSoftDeleteUsecase のインターフェースを定義
+type UserSoftDeleteUsecase interface {
+	SoftDelete(ctx context.Context, input UserSoftDeleteUsecaseInput) error
+}
+
+// userSoftDeleteUsecase ユースケース
+type userSoftDeleteUsecase struct {
+	db       *sql.DB
+	userRepo repository.UserRepository
+}
+
+// NewUserSoftDeleteUsecase は userSoftDeleteUsecase を初期化する
+func NewUserSoftDeleteUsecase(
+	db *sql.DB,
+	userRepo repository.UserRepository,
+) UserSoftDeleteUsecase {
+	return &userSoftDeleteUsecase{
+		db:       db,
+		userRepo: userRepo,
+	}
+}
+
+// UserSoftDeleteUsecaseInput はuserUsecase.SoftDeleteのインプット
+type UserSoftDeleteUsecaseInput struct {
 	UserID int
 }
 
 // SoftDelete はユーザー情報を論理削除する
-func (a *userUsecase) SoftDelete(ctx context.Context, input UserUsecaseSoftDeleteInput) error {
+func (a *userSoftDeleteUsecase) SoftDelete(ctx context.Context, input UserSoftDeleteUsecaseInput) error {
 	tx, err := a.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -29,8 +54,8 @@ func (a *userUsecase) SoftDelete(ctx context.Context, input UserUsecaseSoftDelet
 
 	userID := entities.UserID(input.UserID)
 	// 自身のユーザー情報は削除できない
-	if auth_context.ContextUserID(ctx) == userID {
-		return errors.New("can't be delete myself")
+	if userID == auth_context.ContextUserID(ctx) {
+		return entities.ErrCannotDeleteMyself
 	}
 
 	// 既存のユーザー情報を取得する

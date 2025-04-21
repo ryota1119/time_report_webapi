@@ -3,8 +3,8 @@ package mock
 import (
 	"context"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
-	"github.com/ryota1119/time_resport/internal/usecase"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/usecase"
 )
 
 var _ usecase.AuthLoginUsecase = (*AuthLoginUsecaseMock)(nil)

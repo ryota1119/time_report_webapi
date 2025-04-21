@@ -4,14 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/redis/go-redis/v9"
 	"strconv"
 	"time"
 
-	"github.com/ryota1119/time_resport/internal/domain/repository"
-	"github.com/ryota1119/time_resport/internal/domain/service"
+	"github.com/redis/go-redis/v9"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/service"
+
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
 var _ AuthRefreshTokenUsecase = (*authRefreshTokenUsecase)(nil)
@@ -55,38 +56,6 @@ type AuthUsecaseRefreshTokenInput struct {
 
 // RefreshToken は新しい accessToken を発行する
 func (a *authRefreshTokenUsecase) RefreshToken(ctx context.Context, input AuthUsecaseRefreshTokenInput) (*entities.AuthToken, error) {
-	// JWT トークンの検証
-	claims, err := a.jwtTokenService.ValidateJwtToken(input.RefreshToken)
-	if err != nil {
-		return nil, err
-	}
-
-	// jwtから組織コードを取得
-	orgCode := entities.OrganizationCode(claims.OrganizationCode)
-
-	// jwtからユーザーIDを取得
-	jwtUserID, err := strconv.Atoi(claims.Subject)
-	if err != nil {
-		return nil, err
-	}
-	userID := entities.UserID(jwtUserID)
-
-	// jti 取得
-	jti := entities.Jti(claims.ID)
-	// Redis でトークンが有効か確認
-	redisUserID, err := a.authRepo.GetUserIDByRefreshToken(ctx, &jti)
-	if errors.Is(err, redis.Nil) {
-		return nil, entities.ErrUserNotFoundInRedis
-	} else if err != nil {
-		return nil, err
-	}
-
-	// リクエストで受け取ったユーザーIDとRedisに保存してあるユーザーIDの比較
-	if userID != *redisUserID {
-		return nil, entities.ErrUnauthorized
-	}
-
-	// データベースにユーザーが存在するか確認
 	tx, err := a.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -99,11 +68,47 @@ func (a *authRefreshTokenUsecase) RefreshToken(ctx context.Context, input AuthUs
 		}
 	}()
 
+	// JWT トークンの検証
+	claims, err := a.jwtTokenService.ValidateJwtToken(input.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+
+	organizationCode := entities.OrganizationCode(claims.OrganizationCode)
+	organization, err := a.organizationRepo.FindByCode(ctx, tx, &organizationCode)
+	if err != nil {
+		return nil, err
+	}
+	ctx = context.WithValue(ctx, "organization_id", organization.ID)
+
+	// jwtからユーザーIDを取得
+	jwtUserID, err := strconv.Atoi(claims.Subject)
+	if err != nil {
+		return nil, err
+	}
+	userID := entities.UserID(jwtUserID)
+
+	// jti 取得
+	jti := entities.Jti(claims.ID)
+	// Redis でトークンが有効か確認
+	redisUserID, err := a.authRepo.GetUserIDByRefreshJti(ctx, &jti)
+	if errors.Is(err, redis.Nil) {
+		return nil, entities.ErrUserNotFoundInRedis
+	} else if err != nil {
+		return nil, err
+	}
+
+	// リクエストで受け取ったユーザーIDとRedisに保存してあるユーザーIDの比較
+	if userID != *redisUserID {
+		return nil, entities.ErrUnauthorized
+	}
+
+	// データベースにユーザーが存在するか確認
 	user, err := a.userRepo.Find(ctx, tx, &userID)
 	if err != nil {
 		return nil, err
 	}
-	org, err := a.organizationRepo.FindByCode(ctx, tx, &orgCode)
+	org, err := a.organizationRepo.FindByCode(ctx, tx, &organizationCode)
 	if err != nil {
 		return nil, err
 	}

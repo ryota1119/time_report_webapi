@@ -5,7 +5,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
 // GenerateJwtToken はしてされたユーザー情報と組織情報、有効きかんからトークン文字列を生成して返す
@@ -28,7 +28,7 @@ func (j *jwtToken) GenerateJwtToken(user *entities.User, organization *entities.
 
 	signedToken, err := token.SignedString(j.secretKey)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, entities.ErrCouldNotGenerateToken
 	}
 
 	return &signedToken, &jti, nil

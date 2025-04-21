@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/ryota1119/time_resport/internal/schema"
+	"github.com/ryota1119/time_resport_webapi/internal/schema"
 
 	"ariga.io/atlas-provider-gorm/gormschema"
 )

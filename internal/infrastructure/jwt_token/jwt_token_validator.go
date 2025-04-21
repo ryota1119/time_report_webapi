@@ -2,7 +2,7 @@ package jwt_token
 
 import (
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
 // ValidateJwtToken はトークンの検証

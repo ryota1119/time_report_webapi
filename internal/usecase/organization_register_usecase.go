@@ -3,11 +3,9 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	"github.com/ryota1119/time_resport/internal/domain/repository"
 
-	"github.com/ryota1119/time_resport/internal/domain/errors"
-
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
 )
 
 // OrganizationRegisterUsecase organizationRegisterUsecase のインターフェースを定義
@@ -66,7 +64,7 @@ func (a *organizationRegisterUsecase) Register(ctx context.Context, input Organi
 	// 既存の組織を取得し、あればエラーを返却
 	_, err = a.organizationRepo.FindByCode(ctx, tx, &organization.Code)
 	if err == nil {
-		return nil, errors.ErrOrganizationAlreadyExists
+		return nil, entities.ErrOrganizationAlreadyExists
 	}
 
 	// 組織情報を作成する
@@ -76,7 +74,7 @@ func (a *organizationRegisterUsecase) Register(ctx context.Context, input Organi
 	}
 
 	// コンテキストに組織IDを格納
-	ctx = context.WithValue(ctx, "organization_id", organizationID)
+	ctx = context.WithValue(ctx, "organization_id", *organizationID)
 
 	// ユーザー情報保存処理
 	user, err := entities.NewUser(
@@ -89,7 +87,7 @@ func (a *organizationRegisterUsecase) Register(ctx context.Context, input Organi
 	// 既存のユーザーを取得し、あればエラーを返却
 	_, err = a.userRepo.FindByEmail(ctx, tx, &user.Email, organizationID)
 	if err == nil {
-		return nil, errors.ErrUserAlreadyExists
+		return nil, entities.ErrUserAlreadyExists
 	}
 	// ユーザー情報を作成する
 	_, err = a.userRepo.Create(ctx, tx, user)

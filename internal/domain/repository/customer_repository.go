@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
 // CustomerRepository CustomerRepositoryのインターフェースを定義
@@ -15,6 +15,8 @@ type CustomerRepository interface {
 	List(ctx context.Context, tx *sql.Tx) ([]entities.Customer, error)
 	// Find は顧客情報を取得する
 	Find(ctx context.Context, tx *sql.Tx, customerID *entities.CustomerID) (*entities.Customer, error)
+	// FindByIDs は entities.CustomerID スライスから顧客情報のスライスを取得する
+	FindByIDs(ctx context.Context, tx *sql.Tx, customerIDs []entities.CustomerID) ([]entities.Customer, error)
 	// Update は顧客情報を更新する
 	Update(ctx context.Context, tx *sql.Tx, customer *entities.Customer) error
 	// SoftDelete は顧客情報を論理削除する

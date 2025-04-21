@@ -2,17 +2,44 @@ package usecase
 
 import (
 	"context"
+	"database/sql"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
+
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
-// SoftDeleteCustomerUsecaseInput は customerUsecase.Create のinput
-type SoftDeleteCustomerUsecaseInput struct {
+var _ CustomerSoftDeleteUsecase = (*customerSoftDeleteUsecase)(nil)
+
+// CustomerSoftDeleteUsecase は usecase.customerSoftDeleteUsecase のインターフェースを定義
+type CustomerSoftDeleteUsecase interface {
+	// SoftDelete は顧客情報を更新する
+	SoftDelete(ctx context.Context, input CustomerSoftDeleteUsecaseInput) error
+}
+
+// customerSoftDeleteUsecase ユースケース
+type customerSoftDeleteUsecase struct {
+	db           *sql.DB
+	customerRepo repository.CustomerRepository
+}
+
+func NewCustomerSoftDeleteUsecase(
+	db *sql.DB,
+	customerRepo repository.CustomerRepository,
+) CustomerSoftDeleteUsecase {
+	return &customerSoftDeleteUsecase{
+		db:           db,
+		customerRepo: customerRepo,
+	}
+}
+
+// CustomerSoftDeleteUsecaseInput は customerUsecase.Create のinput
+type CustomerSoftDeleteUsecaseInput struct {
 	CustomerID uint
 }
 
 // SoftDelete は顧客情報を論理削除する
-func (a *customerUsecase) SoftDelete(ctx context.Context, input SoftDeleteCustomerUsecaseInput) error {
+func (a *customerSoftDeleteUsecase) SoftDelete(ctx context.Context, input CustomerSoftDeleteUsecaseInput) error {
 	tx, err := a.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err

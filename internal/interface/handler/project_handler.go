@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	domainerrors "github.com/ryota1119/time_resport/internal/domain/errors"
-	"github.com/ryota1119/time_resport/internal/interface/presenter"
-	"github.com/ryota1119/time_resport/internal/usecase"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/interface/presenter"
+	"github.com/ryota1119/time_resport_webapi/internal/usecase"
 )
 
 // ProjectHandler はprojectHandlerのインターフェース
@@ -21,17 +21,29 @@ type ProjectHandler interface {
 
 // projectHandler の実装
 type projectHandler struct {
-	projectUsecase usecase.ProjectUsecase
+	projectCreateUsecase     usecase.ProjectCreateUsecase
+	projectListUsecase       usecase.ProjectListUsecase
+	projectGetUsecase        usecase.ProjectGetUsecase
+	projectUpdateUsecase     usecase.ProjectUpdateUsecase
+	projectSoftDeleteUsecase usecase.ProjectSoftDeleteUsecase
 }
 
 var _ ProjectHandler = (*projectHandler)(nil)
 
 // NewProjectHandler はprojectHandlerの初期化を行う
 func NewProjectHandler(
-	projectUsecase usecase.ProjectUsecase,
+	projectCreateUsecase usecase.ProjectCreateUsecase,
+	projectListUsecase usecase.ProjectListUsecase,
+	projectGetUsecase usecase.ProjectGetUsecase,
+	projectUpdateUsecase usecase.ProjectUpdateUsecase,
+	projectSoftDeleteUsecase usecase.ProjectSoftDeleteUsecase,
 ) ProjectHandler {
 	return &projectHandler{
-		projectUsecase: projectUsecase,
+		projectCreateUsecase:     projectCreateUsecase,
+		projectListUsecase:       projectListUsecase,
+		projectGetUsecase:        projectGetUsecase,
+		projectUpdateUsecase:     projectUpdateUsecase,
+		projectSoftDeleteUsecase: projectSoftDeleteUsecase,
 	}
 }
 
@@ -68,14 +80,14 @@ func (h *projectHandler) Create(c *gin.Context) {
 		return
 	}
 
-	input := usecase.CreateProjectUsecaseInput{
+	input := usecase.ProjectCreateUsecaseInput{
 		CustomerID: req.CustomerID,
 		Name:       req.Name,
 		UnitPrice:  req.UnitPrice,
 		StartDate:  req.StartDate,
 		EndDate:    req.EndDate,
 	}
-	project, err := h.projectUsecase.Create(ctx, input)
+	project, err := h.projectCreateUsecase.Create(ctx, input)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -100,13 +112,13 @@ func (h *projectHandler) Create(c *gin.Context) {
 func (h *projectHandler) List(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	projects, err := h.projectUsecase.List(ctx)
+	projectWitnCustomer, err := h.projectListUsecase.List(ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	resp := presenter.NewProjectListResponse(projects)
+	resp := presenter.NewProjectListResponse(projectWitnCustomer)
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -132,16 +144,16 @@ func (h *projectHandler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 	var req ProjectGetURIRequest
 	if err := c.ShouldBindUri(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	input := usecase.GetProjectUsecaseInput{
+	input := usecase.ProjectGetUsecaseInput{
 		ProjectID: req.ProjectID,
 	}
-	project, err := h.projectUsecase.Get(ctx, input)
+	project, err := h.projectGetUsecase.Get(ctx, input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -184,18 +196,18 @@ func (h *projectHandler) Update(c *gin.Context) {
 
 	var uriReq ProjectUpdateURIRequest
 	if err := c.ShouldBindUri(&uriReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var bodyReq ProjectUpdateBodyRequest
 	if err := c.ShouldBindJSON(&bodyReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	// 更新処理
-	input := usecase.UpdateProjectUsecaseInput{
+	input := usecase.ProjectUpdateUsecaseInput{
 		ProjectID:  uriReq.ProjectID,
 		CustomerID: bodyReq.CustomerID,
 		Name:       bodyReq.Name,
@@ -203,12 +215,12 @@ func (h *projectHandler) Update(c *gin.Context) {
 		StartDate:  bodyReq.StartDate,
 		EndDate:    bodyReq.EndDate,
 	}
-	project, err := h.projectUsecase.Update(ctx, input)
+	project, err := h.projectUpdateUsecase.Update(ctx, input)
 	if err != nil {
-		if errors.Is(err, domainerrors.ErrNoContentUpdated) {
+		if errors.Is(err, entities.ErrNoContentUpdated) {
 			c.JSON(http.StatusNoContent, nil)
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -240,16 +252,16 @@ func (h *projectHandler) Delete(c *gin.Context) {
 
 	var req ProjectDeleteURIRequest
 	if err := c.ShouldBindUri(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	input := usecase.DeleteProjectUsecaseInput{
+	input := usecase.ProjectSoftDeleteUsecaseInput{
 		ProjectID: req.ProjectID,
 	}
-	err := h.projectUsecase.SoftDelete(ctx, input)
+	err := h.projectSoftDeleteUsecase.SoftDelete(ctx, input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
 	c.JSON(http.StatusNoContent, nil)

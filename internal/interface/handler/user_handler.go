@@ -1,11 +1,15 @@
 package handler
 
 import (
+	"errors"
+	"github.com/ryota1119/time_resport_webapi/internal/helper/auth_context"
 	"net/http"
 
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+
 	"github.com/gin-gonic/gin"
-	"github.com/ryota1119/time_resport/internal/interface/presenter"
-	"github.com/ryota1119/time_resport/internal/usecase"
+	"github.com/ryota1119/time_resport_webapi/internal/interface/presenter"
+	"github.com/ryota1119/time_resport_webapi/internal/usecase"
 )
 
 // UserHandler はuserhandlerのインターフェース
@@ -15,21 +19,34 @@ type UserHandler interface {
 	Get(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
+	Me(c *gin.Context)
 }
 
 // userHandler の実装
 type userHandler struct {
-	userUsecase usecase.UserUsecase
+	userCreateUsecase     usecase.UserCreateUsecase
+	userListUsecase       usecase.UserListUsecase
+	userGetUsecase        usecase.UserGetUsecase
+	userUpdateUsecase     usecase.UserUpdateUsecase
+	userSoftDeleteUsecase usecase.UserSoftDeleteUsecase
 }
 
 var _ UserHandler = (*userHandler)(nil)
 
 // NewUserHandler はuserHandlerの初期化を行う
 func NewUserHandler(
-	userUsecase usecase.UserUsecase,
+	userCreateUsecase usecase.UserCreateUsecase,
+	userListUsecase usecase.UserListUsecase,
+	userGetUsecase usecase.UserGetUsecase,
+	userUpdateUsecase usecase.UserUpdateUsecase,
+	userSoftDeleteUsecase usecase.UserSoftDeleteUsecase,
 ) UserHandler {
 	return &userHandler{
-		userUsecase: userUsecase,
+		userCreateUsecase:     userCreateUsecase,
+		userListUsecase:       userListUsecase,
+		userGetUsecase:        userGetUsecase,
+		userUpdateUsecase:     userUpdateUsecase,
+		userSoftDeleteUsecase: userSoftDeleteUsecase,
 	}
 }
 
@@ -61,19 +78,19 @@ func (h *userHandler) Create(c *gin.Context) {
 	var req UserCreateBodyRequest
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	input := usecase.UserUsecaseCreateInput{
+	input := usecase.UserCreateUsecaseInput{
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: req.Password,
 		Role:     req.Role,
 	}
-	user, err := h.userUsecase.Create(ctx, input)
+	user, err := h.userCreateUsecase.Create(ctx, input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -95,9 +112,9 @@ func (h *userHandler) Create(c *gin.Context) {
 //	@Router			/users [GET]
 func (h *userHandler) List(c *gin.Context) {
 	ctx := c.Request.Context()
-	users, err := h.userUsecase.List(ctx)
+	users, err := h.userListUsecase.List(ctx)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -127,16 +144,20 @@ func (h *userHandler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 	var req UserGetURIRequest
 	if err := c.ShouldBindUri(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	input := usecase.UserUsecaseGetInput{
+	input := usecase.UserGetUsecaseInput{
 		UserID: req.UserID,
 	}
-	user, err := h.userUsecase.Get(ctx, input)
+	user, err := h.userGetUsecase.Get(ctx, input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		if errors.Is(err, entities.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": entities.ErrUserNotFound.Error()})
+			return
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	resp := presenter.NewUserGetResponse(user)
@@ -175,25 +196,25 @@ func (h *userHandler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	var uriReq UserUpdateURIRequest
 	if err := c.ShouldBindUri(&uriReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var bodyReq UserUpdateBodyRequest
 	if err := c.ShouldBindJSON(&bodyReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	input := usecase.UserUsecaseUpdateInput{
+	input := usecase.UserUpdateUsecaseInput{
 		UserID: uriReq.UserID,
 		Name:   bodyReq.Name,
 		Email:  bodyReq.Email,
 		Role:   bodyReq.Role,
 	}
-	user, err := h.userUsecase.Update(ctx, input)
+	user, err := h.userUpdateUsecase.Update(ctx, input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -225,18 +246,51 @@ func (h *userHandler) Delete(c *gin.Context) {
 
 	var req UserDeleteURIRequest
 	if err := c.ShouldBindUri(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	input := usecase.UserUsecaseSoftDeleteInput{
+	input := usecase.UserSoftDeleteUsecaseInput{
 		UserID: req.UserID,
 	}
-	err := h.userUsecase.SoftDelete(ctx, input)
+	err := h.userSoftDeleteUsecase.SoftDelete(ctx, input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, nil)
+}
+
+// Me はログインしているユーザー情報を返却する
+//
+//	@Summary		Get User Myself
+//	@Description	ログインしているユーザー情報を返却する
+//	@Tags			user
+//	@Security		BearerAuth
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	presenter.UserGetMeResponse
+//	@Failure		400	{object}	nil	"BadRequest"
+//	@Failure		401	{object}	nil	"Unauthorized"
+//	@Router			/users/me [GET]
+func (h *userHandler) Me(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	userID := auth_context.ContextUserID(ctx)
+	input := usecase.UserGetUsecaseInput{
+		UserID: userID.Int(),
+	}
+	user, err := h.userGetUsecase.Get(ctx, input)
+	if err != nil {
+		if errors.Is(err, entities.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": entities.ErrUserNotFound.Error()})
+			return
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	resp := presenter.NewUserGetMeResponse(user)
+	c.JSON(http.StatusOK, resp)
 }

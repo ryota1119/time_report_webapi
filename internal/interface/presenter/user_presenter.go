@@ -1,7 +1,7 @@
 package presenter
 
 import (
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
 // UserResponse 顧客APIの基本レスポンス構造体
@@ -70,6 +70,21 @@ type UserUpdateResponse UserResponse
 // ユーザー更新時のレスポンスとして使用
 func NewUserUpdateResponse(user *entities.User) UserUpdateResponse {
 	return UserUpdateResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+		Role:  user.Role,
+	}
+}
+
+// UserGetMeResponse ログインしているユーザー情報を返却する時のレスポンス
+// UserResponseを継承し、ログインしているユーザー情報のデータを返す
+type UserGetMeResponse UserResponse
+
+// NewUserGetMeResponse domain.User から UserGetMeResponse を生成する
+// ユーザー更新時のレスポンスとして使用
+func NewUserGetMeResponse(user *entities.User) UserGetMeResponse {
+	return UserGetMeResponse{
 		ID:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,

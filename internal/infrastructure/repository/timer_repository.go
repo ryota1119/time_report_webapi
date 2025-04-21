@@ -5,12 +5,11 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"errors"
-	domainerrors "github.com/ryota1119/time_resport/internal/domain/errors"
 	"time"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
-	"github.com/ryota1119/time_resport/internal/domain/repository"
-	"github.com/ryota1119/time_resport/internal/helper/auth_context"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
+	"github.com/ryota1119/time_resport_webapi/internal/helper/auth_context"
 )
 
 type TimerRepository struct{}
@@ -83,7 +82,7 @@ func (r *TimerRepository) Find(ctx context.Context, tx *sql.Tx, timerID *entitie
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, domainerrors.ErrTimerNotFound
+			return nil, entities.ErrTimerNotFound
 		}
 		return nil, err
 	}

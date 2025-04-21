@@ -6,10 +6,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
-	domainerrors "github.com/ryota1119/time_resport/internal/domain/errors"
-	"github.com/ryota1119/time_resport/internal/domain/repository"
-	"github.com/ryota1119/time_resport/internal/helper/auth_context"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
+	"github.com/ryota1119/time_resport_webapi/internal/helper/auth_context"
 )
 
 type BudgetRepository struct{}
@@ -106,7 +105,7 @@ func (r *BudgetRepository) Find(ctx context.Context, tx *sql.Tx, budgetID *entit
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, domainerrors.ErrBudgetNotFound
+			return nil, entities.ErrBudgetNotFound
 		}
 		return nil, err
 	}
@@ -137,7 +136,7 @@ func (r *BudgetRepository) FindWithProject(ctx context.Context, tx *sql.Tx, budg
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, domainerrors.ErrBudgetNotFound
+			return nil, entities.ErrBudgetNotFound
 		}
 		return nil, err
 	}

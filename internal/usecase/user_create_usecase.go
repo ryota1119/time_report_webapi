@@ -2,12 +2,39 @@ package usecase
 
 import (
 	"context"
+	"database/sql"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
+
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
-// UserUsecaseCreateInput userUsecase.Createのインプット
-type UserUsecaseCreateInput struct {
+var _ UserCreateUsecase = (*userCreateUsecase)(nil)
+
+// UserCreateUsecase は usecase.userCreateUsecase のインターフェースを定義
+type UserCreateUsecase interface {
+	Create(ctx context.Context, input UserCreateUsecaseInput) (_ *entities.User, err error)
+}
+
+// userCreateUsecase ユースケース
+type userCreateUsecase struct {
+	db       *sql.DB
+	userRepo repository.UserRepository
+}
+
+// NewUserCreateUsecase は userCreateUsecase を初期化する
+func NewUserCreateUsecase(
+	db *sql.DB,
+	userRepo repository.UserRepository,
+) UserCreateUsecase {
+	return &userCreateUsecase{
+		db:       db,
+		userRepo: userRepo,
+	}
+}
+
+// UserCreateUsecaseInput userCreateUsecase.Createのインプット
+type UserCreateUsecaseInput struct {
 	Name     string
 	Email    string
 	Password string
@@ -15,7 +42,7 @@ type UserUsecaseCreateInput struct {
 }
 
 // Create はユーザーを新規作成する
-func (a *userUsecase) Create(ctx context.Context, input UserUsecaseCreateInput) (_ *entities.User, err error) {
+func (a *userCreateUsecase) Create(ctx context.Context, input UserCreateUsecaseInput) (_ *entities.User, err error) {
 	tx, err := a.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err

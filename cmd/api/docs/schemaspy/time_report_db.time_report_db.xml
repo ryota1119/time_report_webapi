@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <database name="time_report_db" schema="time_report_db" type="MySQL - 9.2.0">
    <tables>
-      <table catalog="time_report_db" name="atlas_schema_revisions" numRows="0" remarks="" type="TABLE">
+      <table catalog="time_report_db" name="atlas_schema_revisions" numRows="1" remarks="" type="TABLE">
          <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="version" nullable="false" remarks="" size="255" type="VARCHAR" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="description" nullable="false" remarks="" size="255" type="VARCHAR" typeCode="12"/>
          <column autoUpdated="false" defaultValue="2" digits="0" id="2" name="type" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5"/>
@@ -44,7 +44,7 @@
             <column ascending="true" name="project_id"/>
          </index>
       </table>
-      <table catalog="time_report_db" name="customers" numRows="0" remarks="" type="TABLE">
+      <table catalog="time_report_db" name="customers" numRows="3" remarks="" type="TABLE">
          <column autoUpdated="true" defaultValue="null" digits="0" id="0" name="id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
             <child catalog="time_report_db" column="customer_id" foreignKey="fk_customers_projects" implied="false" onDeleteCascade="true" table="projects"/>
          </column>
@@ -89,7 +89,7 @@
             <column ascending="true" name="organization_code"/>
          </index>
       </table>
-      <table catalog="time_report_db" name="projects" numRows="0" remarks="" type="TABLE">
+      <table catalog="time_report_db" name="projects" numRows="3" remarks="" type="TABLE">
          <column autoUpdated="true" defaultValue="null" digits="0" id="0" name="id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
             <child catalog="time_report_db" column="project_id" foreignKey="fk_projects_budgets" implied="false" onDeleteCascade="true" table="budgets"/>
             <child catalog="time_report_db" column="project_id" foreignKey="fk_projects_timer" implied="false" onDeleteCascade="true" table="timers"/>
@@ -158,7 +158,7 @@
             <column ascending="true" name="user_id"/>
          </index>
       </table>
-      <table catalog="time_report_db" name="users" numRows="0" remarks="" type="TABLE">
+      <table catalog="time_report_db" name="users" numRows="4" remarks="" type="TABLE">
          <column autoUpdated="true" defaultValue="null" digits="0" id="0" name="id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED" typeCode="-5">
             <child catalog="time_report_db" column="user_id" foreignKey="fk_users_timer" implied="false" onDeleteCascade="true" table="timers"/>
          </column>

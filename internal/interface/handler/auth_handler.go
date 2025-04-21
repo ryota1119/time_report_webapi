@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ryota1119/time_resport/internal/interface/presenter"
-	"github.com/ryota1119/time_resport/internal/usecase"
+	"github.com/ryota1119/time_resport_webapi/internal/interface/presenter"
+	"github.com/ryota1119/time_resport_webapi/internal/usecase"
 )
 
 // AuthHandler はauthHandlerのインターフェース
@@ -119,6 +119,10 @@ func (h *authHandler) RefreshToken(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	c.SetSameSite(http.SameSiteNoneMode)
+	c.SetCookie("access_token", token.AccessToken.String(), 3600, "/", os.Getenv("COOKIE_DOMAIN"), false, true)
+	c.SetCookie("refresh_token", token.RefreshToken.String(), 30*24*3600, "/", os.Getenv("COOKIE_DOMAIN"), false, true)
 
 	resp := presenter.NewAuthRefreshTokenResponse(token)
 	c.JSON(http.StatusOK, resp)

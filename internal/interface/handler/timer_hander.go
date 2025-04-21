@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/ryota1119/time_resport/internal/interface/presenter"
-	"github.com/ryota1119/time_resport/internal/usecase"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/ryota1119/time_resport_webapi/internal/interface/presenter"
+	"github.com/ryota1119/time_resport_webapi/internal/usecase"
 )
 
 var _ TimerHandler = (*timerHandler)(nil)

@@ -11,6 +11,10 @@ schemadiff: internal/schema
 migrate: schemadiff
 	atlas migrate apply --url $(DATABASE_URL)
 
+.PHONY: initial_migrate
+initial_migrate:
+	atlas migrate apply --url $(DATABASE_URL)
+
 .PHONY: swag_init
 swag_init: swag_fmt
 	swag init -g cmd/api/main.go --output cmd/api/docs/swagger

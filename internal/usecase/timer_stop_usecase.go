@@ -3,10 +3,11 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	"github.com/ryota1119/time_resport/internal/domain/repository"
 	"time"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/repository"
+
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
 var _ TimerStopUsecase = (*timerStopUsecase)(nil)

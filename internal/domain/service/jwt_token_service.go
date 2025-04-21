@@ -3,7 +3,7 @@ package service
 import (
 	"time"
 
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
 type JwtTokenService interface {

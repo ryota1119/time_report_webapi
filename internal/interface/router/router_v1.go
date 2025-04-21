@@ -2,9 +2,9 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	_ "github.com/ryota1119/time_resport/cmd/api/docs/swagger"
-	"github.com/ryota1119/time_resport/internal/interface/handler"
-	"github.com/ryota1119/time_resport/internal/interface/middleware"
+	_ "github.com/ryota1119/time_resport_webapi/cmd/api/docs/swagger"
+	"github.com/ryota1119/time_resport_webapi/internal/interface/handler"
+	"github.com/ryota1119/time_resport_webapi/internal/interface/middleware"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -82,6 +82,7 @@ func (r *Router) setupUserRoutes(group *gin.RouterGroup) {
 	userGroup := group.Group("/users").Use(r.authMiddleware.AuthMiddleware())
 	{
 		userGroup.GET("", r.userHandler.List)
+		userGroup.GET("/me", r.userHandler.Me)
 		userGroup.GET("/:userID", r.userHandler.Get)
 		userGroup.PUT("/:userID", r.userHandler.Update)
 	}
@@ -123,8 +124,8 @@ func (r *Router) setupProjectRoutes(group *gin.RouterGroup) {
 	adminGroup := projectGroup.Use(r.authMiddleware.RequireAdmin())
 	{
 		adminGroup.POST("", r.projectHandler.Create)
-		adminGroup.PUT("/:customerID", r.projectHandler.Update)
-		adminGroup.DELETE("/:customerID", r.projectHandler.Delete)
+		adminGroup.PUT("/:projectID", r.projectHandler.Update)
+		adminGroup.DELETE("/:projectID", r.projectHandler.Delete)
 	}
 }
 

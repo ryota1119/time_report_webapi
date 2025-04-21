@@ -9,19 +9,49 @@ import (
 // UserID ユーザーID
 type UserID uint
 
-// String はUserIDをstring型にキャストする
+// String は UserID を string 型にキャストする
 func (uid UserID) String() string {
 	return strconv.FormatUint(uint64(uid), 10)
+}
+
+// Int は UserID を int 型にキャストする
+func (uid UserID) Int() int {
+	return int(uid)
 }
 
 // UserName ユーザーネーム
 type UserName string
 
+// String は UserName を string 型にキャストする
+func (n UserName) String() string {
+	return string(n)
+}
+
 // UserEmail ユーザーEメールアドレス
 type UserEmail string
 
+// String は UserEmail を string 型にキャストする
+func (e UserEmail) String() string {
+	return string(e)
+}
+
 // HashedPassword ハッシュパスワード
 type HashedPassword string
+
+// CheckHashedPassword は二つのパスワードを比較する
+func (p HashedPassword) CheckHashedPassword(password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(p), []byte(password))
+}
+
+// hashPassword は指定された文字列をハッシュ化し HashedPassword を生成する
+func hashPassword(password string) (*HashedPassword, error) {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+	hashedPassword := HashedPassword(hashed)
+	return &hashedPassword, nil
+}
 
 // Role ユーザー権限
 type Role string
@@ -35,7 +65,7 @@ const (
 	UnknownRole Role = "unknown"
 )
 
-// String はRoleをstring型にキャストする
+// String は Role を string 型にキャストする
 func (r Role) String() string {
 	return string(r)
 }
@@ -62,21 +92,6 @@ func NewUser(name, email, password, role string) (*User, error) {
 		HashedPassword: *hashedPassword,
 		Role:           Role(role),
 	}, nil
-}
-
-// HashPassword は指定された文字列をハッシュ化し Password を生成する
-func hashPassword(password string) (*HashedPassword, error) {
-	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
-	hashedPassword := HashedPassword(hashed)
-	return &hashedPassword, nil
-}
-
-// CheckHashedPassword は二つのパスワードを比較する
-func (p HashedPassword) CheckHashedPassword(password string) error {
-	return bcrypt.CompareHashAndPassword([]byte(p), []byte(password))
 }
 
 // CachedUser Redis用のキャッシュユーザー

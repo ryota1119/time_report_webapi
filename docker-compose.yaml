@@ -12,6 +12,8 @@ services:
       - apparmor:unconfined
     cap_add:
       - SYS_PTRACE
+    depends_on:
+      - mysql
 
   mysql:
     build:

@@ -2,7 +2,8 @@ package auth
 
 import (
 	"context"
-	"github.com/ryota1119/time_resport/internal/domain/entities"
+
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
 )
 
 // GetOrganizationLoginService 組織情報を取得する

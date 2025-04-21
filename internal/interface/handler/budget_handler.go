@@ -4,10 +4,11 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+
 	"github.com/gin-gonic/gin"
-	domainerrors "github.com/ryota1119/time_resport/internal/domain/errors"
-	"github.com/ryota1119/time_resport/internal/interface/presenter"
-	"github.com/ryota1119/time_resport/internal/usecase"
+	"github.com/ryota1119/time_resport_webapi/internal/interface/presenter"
+	"github.com/ryota1119/time_resport_webapi/internal/usecase"
 )
 
 // BudgetHandler はbudgetHandlerのインターフェース
@@ -144,7 +145,7 @@ func (h *budgetHandler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 	var req BudgetGetURIRequest
 	if err := c.ShouldBindUri(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -153,11 +154,11 @@ func (h *budgetHandler) Get(c *gin.Context) {
 	}
 	budget, err := h.budgetGetUsecase.Get(ctx, input)
 	if err != nil {
-		if errors.Is(err, domainerrors.ErrBudgetNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": ErrNotFound.Error()})
+		if errors.Is(err, entities.ErrBudgetNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -200,13 +201,13 @@ func (h *budgetHandler) Update(c *gin.Context) {
 
 	var uriReq BudgetUpdateURIRequest
 	if err := c.ShouldBindUri(&uriReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var bodyReq BudgetUpdateBodyRequest
 	if err := c.ShouldBindJSON(&bodyReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -221,10 +222,10 @@ func (h *budgetHandler) Update(c *gin.Context) {
 	}
 	budget, err := h.budgetUpdateUsecase.Update(ctx, input)
 	if err != nil {
-		if errors.Is(err, domainerrors.ErrNoContentUpdated) {
+		if errors.Is(err, entities.ErrNoContentUpdated) {
 			c.JSON(http.StatusNoContent, nil)
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -256,7 +257,7 @@ func (h *budgetHandler) Delete(c *gin.Context) {
 
 	var req BudgetDeleteURIRequest
 	if err := c.ShouldBindUri(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -265,7 +266,7 @@ func (h *budgetHandler) Delete(c *gin.Context) {
 	}
 	err := h.budgetDeleteUsecase.Delete(ctx, input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": ErrBadRequest.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
 	c.JSON(http.StatusNoContent, nil)

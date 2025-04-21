@@ -3,15 +3,15 @@ package middleware
 import (
 	"context"
 	"fmt"
+	"github.com/ryota1119/time_resport_webapi/internal/infrastructure/auth"
+	"github.com/ryota1119/time_resport_webapi/internal/infrastructure/logger"
+	"github.com/ryota1119/time_resport_webapi/internal/interface/handler"
 	"net/http"
 	"strings"
 
-	"github.com/ryota1119/time_resport/internal/infrastructure/auth"
-	"github.com/ryota1119/time_resport/internal/interface/handler"
-
 	"github.com/gin-gonic/gin"
-	"github.com/ryota1119/time_resport/internal/domain/entities"
-	"github.com/ryota1119/time_resport/internal/helper/auth_context"
+	"github.com/ryota1119/time_resport_webapi/internal/domain/entities"
+	"github.com/ryota1119/time_resport_webapi/internal/helper/auth_context"
 )
 
 type AuthMiddleware interface {
@@ -47,6 +47,12 @@ func (a *authMiddleware) AuthMiddleware() gin.HandlerFunc {
 			tokenStr = strings.TrimPrefix(authHeader, "Bearer ")
 		}
 
+		if tokenStr == "" {
+			if cookie, err := c.Cookie("access_token"); err == nil {
+				tokenStr = cookie
+			}
+		}
+		logger.Info(tokenStr)
 		if tokenStr == "" {
 			c.JSON(http.StatusUnauthorized, handler.ErrUnauthorized.Error())
 			c.Abort()
